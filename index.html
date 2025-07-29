@@ -1,128 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agent Chat Initiator</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Agent Directory</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f9f9f9;
+      margin: 0;
+      padding: 12px;
+      background-color: #f0f4f8;
     }
-    .container {
-      max-width: 500px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
+
+    .agent-container {
+      max-width: 300px;
+      background-color: #fff;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 20px;
     }
+
     h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    label, select, button {
-      width: 100%;
+      font-size: 1.25rem;
       margin-bottom: 15px;
+      color: #2c3e50;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
     }
-    #chat-box {
-      border: 1px solid #ccc;
-      padding: 10px;
-      height: 200px;
-      overflow-y: auto;
-      background-color: #f1f1f1;
+
+    ul#agentList {
+      list-style: none;
+      padding: 0;
     }
-    #chat-input {
-      width: 100%;
-      padding: 8px;
-      margin-top: 10px;
+
+    ul#agentList li {
+      padding: 10px 15px;
+      margin-bottom: 8px;
+      background-color: #ecf0f1;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
     }
-    #sendBtn {
-      margin-top: 10px;
-      width: 100%;
+
+    ul#agentList li:hover {
+      background-color: #d0e4f0;
+    }
+
+    ul#agentList li:active {
+      background-color: #b3d4ec;
     }
   </style>
-  <script src="https://connect-cdn.amazon.com/ccp-v2/connect-streams.js"></script>
-  <script src="https://unpkg.com/amazon-connect-chatjs@3.0.0/dist/chatjs.min.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h2>Start Internal Chat</h2>
-    <label for="agentSelect">Select Agent to Chat With:</label>
-    <select id="agentSelect">
-      <option value="quickConnectId-agentB">Agent B</option>
-      <option value="quickConnectId-agentC">Agent C</option>
-    </select>
 
-    <button id="startChatBtn">Start Chat</button>
-
-    <div id="chat-box"></div>
-    <input type="text" id="chat-input" placeholder="Type your message here..." />
-    <button id="sendBtn">Send</button>
+  <div class="agent-container">
+    <h2>Available Agents</h2>
+    <ul id="agentList">
+      <li>Loading agents...</li>
+    </ul>
   </div>
 
   <script>
-    const apiUrl = "https://n90bf8tg42.execute-api.us-east-1.amazonaws.com/AgentToAgentChat";
+    const apiUrl = 'https://n90bf8tg42.execute-api.us-east-1.amazonaws.com/AgentToAgentChat';
 
-    let chatSession = null;
-    let currentAgent = { name: "", agentId: "" };
+    fetch(apiUrl)
+      .then(response => {
+        if (!response.ok) throw new Error('Failed to fetch agent list');
+        return response.json();
+      })
+      .then(agentNames => {
+        const list = document.getElementById('agentList');
+        list.innerHTML = ''; // Clear loading text
 
-    // Get current agent info from CCP
-    connect.agent((agent) => {
-      currentAgent.name = agent.getName();
-      currentAgent.agentId = agent.getAgentId();
-      console.log("Logged-in Agent:", currentAgent);
-    });
-
-    document.getElementById('startChatBtn').onclick = async () => {
-      const quickConnectId = document.getElementById('agentSelect').value;
-
-      if (!currentAgent.agentId || !currentAgent.name) {
-        alert("Agent info not available yet. Try again in a moment.");
-        return;
-      }
-
-      const payload = {
-        sourceAgentId: currentAgent.agentId,
-        sourceAgentName: currentAgent.name,
-        targetQuickConnectId: quickConnectId
-      };
-
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        agentNames.forEach(name => {
+          const li = document.createElement('li');
+          li.textContent = name;
+          li.addEventListener('click', () => {
+            alert(`Start chat with ${name}`); 
+            // Replace this with actual chat init logic
+          });
+          list.appendChild(li);
+        });
+      })
+      .catch(error => {
+        console.error('Fetch error:', error);
+        document.getElementById('agentList').innerHTML = `<li>Error loading agents</li>`;
       });
-
-      const data = await response.json();
-
-      chatSession = await connect.ChatSession.create({
-        chatDetails: {
-          ContactId: data.ContactId,
-          ParticipantId: data.ParticipantId,
-          ParticipantToken: data.ParticipantToken
-        },
-        type: 'CUSTOMER'
-      });
-
-      // Send initial message to let Agent B know who initiated the chat
-      await chatSession.sendMessage({ content: `Hello! This is ${currentAgent.name}.` });
-      document.getElementById('chat-box').innerHTML += `<div><b>You:</b> Hello! This is ${currentAgent.name}.</div>`;
-
-      chatSession.onMessage(({ content }) => {
-        document.getElementById('chat-box').innerHTML += `<div><b>Them:</b> ${content}</div>`;
-      });
-    };
-
-    document.getElementById('sendBtn').onclick = async () => {
-      const msg = document.getElementById('chat-input').value;
-      if (chatSession && msg.trim() !== '') {
-        await chatSession.sendMessage({ content: msg });
-        document.getElementById('chat-box').innerHTML += `<div><b>You:</b> ${msg}</div>`;
-        document.getElementById('chat-input').value = '';
-      }
-    };
   </script>
 </body>
 </html>
