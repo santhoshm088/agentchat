@@ -51,6 +51,19 @@
     }
   </style>
 </head>
+<script type="text/javascript">
+  (function(w, d, x, id){
+    s=d.createElement('script');
+    s.src='https://sharecare-hds-dev-p3f.my.connect.aws/connectwidget/static/amazon-connect-chat-interface-client.js';
+    s.async=1;
+    s.id=id;
+    d.getElementsByTagName('head')[0].appendChild(s);
+    w[x] =  w[x] || function() { (w[x].ac = w[x].ac || []).push(arguments) };
+  })(window, document, 'amazon_connect', '51bb78eb-2024-4bab-a426-c3ca21e14331');
+  amazon_connect('styles', { iconType: 'CHAT', openChat: { color: '#ffffff', backgroundColor: '#123456' }, closeChat: { color: '#ffffff', backgroundColor: '#123456'} });
+  amazon_connect('snippetId', 'QVFJREFIaFg3VVJ2dFRXb2IrUUdndUkvUzRJMnRnQ1NJL3Erc1JKT0lFQ3lCQlNlUEFFSnBlREpsTldscUlya3hNbjNkYTJ4QUFBQWJqQnNCZ2txaGtpRzl3MEJCd2FnWHpCZEFnRUFNRmdHQ1NxR1NJYjNEUUVIQVRBZUJnbGdoa2dCWlFNRUFTNHdFUVFNNHRpTGthdExjVTRENmI3dUFnRVFnQ3Z3bHNhYkx6THBEM3dFN2JOWFkzZEtuVHJGZ1JWVnM3Sk5lOW5Mb2oxNFk0bUxURXRHRG02b1c4Wmk6OkthQ1pySzRxaFF4OEJDd3RYazUreTQyTVc0R2x3ZnJUQmdmejBhTG5vOXZvN25Pc3ZlNmZ1SmxtWWRZa09wc2dITkVDRDIxbVdBazBzczFKSzZ2ZncvakRTczRFTHUwV2hlUTk2UU5QbzJacnJMS294NjFCeXNXT1ZDOVNFNHlvbHpvSjdjcnJLL0V1YytsamZwSVRLcXpIZlcwQTlGcz0=');
+  amazon_connect('supportedMessagingContentTypes', [ 'text/plain', 'text/markdown', 'application/vnd.amazonaws.connect.message.interactive', 'application/vnd.amazonaws.connect.message.interactive.response' ]);
+</script>
 <body>
 
   <div class="agent-container">
