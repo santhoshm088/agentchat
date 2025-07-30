@@ -153,28 +153,24 @@
       w[x] = w[x] || function() { (w[x].ac = w[x].ac || []).push(arguments) };
     })(window, document, 'amazon_connect', '51bb78eb-2024-4bab-a426-c3ca21e14331');
 
-    // Wait for script to load before configuring
-    window.addEventListener('load', function() {
-      // Configure widget styles
-      amazon_connect('styles', { 
-        iconType: 'CHAT', 
-        openChat: { color: '#ffffff', backgroundColor: '#00BFA5' }, 
-        closeChat: { color: '#ffffff', backgroundColor: '#00BFA5'} 
-      });
-
-      // Set snippet ID
-      amazon_connect('snippetId', 'QVFJREFIaFg3VVJ2dFRXb2IrUUdndUkvUzRJMnRnQ1NJL3Erc1JKT0lFQ3lCQlNlUEFFSnBlREpsTldscUlya3hNbjNkYTJ4QUFBQWJqQnNCZ2txaGtpRzl3MEJCd2FnWHpCZEFnRUFNRmdHQ1NxR1NJYjNEUUVIQVRBZUJnbGdoa2dCWlFNRUFTNHdFUVFNNHRpTGthdExjVTRENmI3dUFnRVFnQ3Z3bHNhYkx6THBEM3dFN2JOWFkzZEtuVHJGZ1JWVnM3Sk5lOW5Mb2oxNFk0bUxURXRHRG02b1c4Wmk6OkthQ1pySzRxaFF4OEJDd3RYazUreTQyTVc0R2x3ZnJUQmdmejBhTG5vOXZvN25Pc3ZlNmZ1SmxtWWRZa09wc2dITkVDRDIxbVdBazBzczFKSzZ2ZncvakRTczRFTHUwV2hlUTk2UU5QbzJacnJMS294NjFCeXNXT1ZDOVNFNHlvbHpvSjdjcnJLL0V1YytsamZwSVRLcXpIZlcwQTlGcz0=');
-
-      // Set supported content types
-      amazon_connect('supportedMessagingContentTypes', [ 
-        'text/plain', 
-        'text/markdown', 
-        'application/vnd.amazonaws.connect.message.interactive', 
-        'application/vnd.amazonaws.connect.message.interactive.response' 
-      ]);
-
-      console.log('Amazon Connect widget initialized');
+    // Initialize widget configuration immediately
+    amazon_connect('styles', { 
+      iconType: 'CHAT', 
+      openChat: { color: '#ffffff', backgroundColor: '#00BFA5' }, 
+      closeChat: { color: '#ffffff', backgroundColor: '#00BFA5'},
+      hideChat: false  // Ensure chat widget is not hidden
     });
+
+    amazon_connect('snippetId', 'QVFJREFIaFg3VVJ2dFRXb2IrUUdndUkvUzRJMnRnQ1NJL3Erc1JKT0lFQ3lCQlNlUEFFSnBlREpsTldscUlya3hNbjNkYTJ4QUFBQWJqQnNCZ2txaGtpRzl3MEJCd2FnWHpCZEFnRUFNRmdHQ1NxR1NJYjNEUUVIQVRBZUJnbGdoa2dCWlFNRUFTNHdFUVFNNHRpTGthdExjVTRENmI3dUFnRVFnQ3Z3bHNhYkx6THBEM3dFN2JOWFkzZEtuVHJGZ1JWVnM3Sk5lOW5Mb2oxNFk0bUxURXRHRG02b1c4Wmk6OkthQ1pySzRxaFF4OEJDd3RYazUreTQyTVc0R2x3ZnJUQmdmejBhTG5vOXZvN25Pc3ZlNmZ1SmxtWWRZa09wc2dITkVDRDIxbVdBazBzczFKSzZ2ZncvakRTczRFTHUwV2hlUTk2UU5QbzJacnJMS294NjFCeXNXT1ZDOVNFNHlvbHpvSjdjcnJML0V1YytsamZwSVRLcXpIZlcwQTlGcz0=');
+
+    amazon_connect('supportedMessagingContentTypes', [ 
+      'text/plain', 
+      'text/markdown', 
+      'application/vnd.amazonaws.connect.message.interactive', 
+      'application/vnd.amazonaws.connect.message.interactive.response' 
+    ]);
+
+    console.log('Amazon Connect widget configuration set');
   </script>
 
   <script>
@@ -253,7 +249,7 @@
       statusDiv.className = type;
     }
 
-    // Start chat with proper attribute setting
+    // Start chat with proper attribute setting and multiple methods
     async function startChat() {
       const initiatingAgent = document.getElementById('initiatingAgent').value.trim();
       
@@ -296,20 +292,93 @@
       addDebugInfo(`Setting session attributes: ${JSON.stringify(sessionAttributes)}`);
 
       try {
-        // Set contact attributes (these will be available in your Connect flow)
+        // Method 1: Set attributes before opening
         amazon_connect('contactAttributes', contactAttributes);
-        
-        // Set session attributes (alternative method)
         amazon_connect('sessionAttributes', sessionAttributes);
 
         showStatus('Opening chat widget...', 'success');
         addDebugInfo('Attempting to open chat widget');
 
-        // Small delay to ensure attributes are set
-        setTimeout(() => {
+        // Method 2: Try multiple approaches to open the widget
+        let chatOpened = false;
+        
+        // Approach 1: Direct open
+        try {
           amazon_connect('openChat');
-          addDebugInfo('Chat widget open command sent');
-        }, 500);
+          addDebugInfo('Method 1: Direct openChat called');
+          
+          // Check if widget appeared after 2 seconds
+          setTimeout(() => {
+            const widgetElements = document.querySelectorAll('[id*="amazon_connect"], [class*="amazon-connect"], [class*="chat-widget"]');
+            if (widgetElements.length > 0) {
+              addDebugInfo('Widget elements found on page');
+              chatOpened = true;
+            } else {
+              addDebugInfo('No widget elements found, trying alternative methods');
+              tryAlternativeMethods();
+            }
+          }, 2000);
+          
+        } catch (error) {
+          addDebugInfo(`Method 1 failed: ${error.message}`);
+          tryAlternativeMethods();
+        }
+
+        // Method 3: Alternative approaches
+        function tryAlternativeMethods() {
+          addDebugInfo('Trying alternative methods...');
+          
+          // Approach 2: Re-initialize and open
+          setTimeout(() => {
+            try {
+              amazon_connect('styles', { 
+                iconType: 'CHAT', 
+                openChat: { color: '#ffffff', backgroundColor: '#00BFA5' }, 
+                closeChat: { color: '#ffffff', backgroundColor: '#00BFA5'}
+              });
+              amazon_connect('contactAttributes', contactAttributes);
+              amazon_connect('openChat');
+              addDebugInfo('Method 2: Re-initialized and opened');
+            } catch (error) {
+              addDebugInfo(`Method 2 failed: ${error.message}`);
+            }
+          }, 1000);
+
+          // Approach 3: Force widget visibility (if widget exists but hidden)
+          setTimeout(() => {
+            try {
+              // Look for hidden widget elements and make them visible
+              const hiddenWidgets = document.querySelectorAll('[style*="display: none"], [style*="visibility: hidden"]');
+              hiddenWidgets.forEach(widget => {
+                if (widget.id && (widget.id.includes('amazon') || widget.id.includes('connect') || widget.id.includes('chat'))) {
+                  widget.style.display = 'block';
+                  widget.style.visibility = 'visible';
+                  widget.style.opacity = '1';
+                  addDebugInfo(`Made widget visible: ${widget.id}`);
+                }
+              });
+
+              // Also try to trigger click on chat button if it exists
+              const chatButtons = document.querySelectorAll('[class*="chat"], [id*="chat"], [class*="amazon-connect"]');
+              chatButtons.forEach(button => {
+                if (button.tagName === 'BUTTON' || button.onclick) {
+                  button.click();
+                  addDebugInfo(`Clicked potential chat button: ${button.className}`);
+                }
+              });
+            } catch (error) {
+              addDebugInfo(`Method 3 failed: ${error.message}`);
+            }
+          }, 2000);
+
+          // Approach 4: Manual widget creation (last resort)
+          setTimeout(() => {
+            if (!chatOpened) {
+              addDebugInfo('All methods failed. Widget may need manual intervention.');
+              showStatus('Chat widget did not open automatically. Please check your Connect configuration.', 'error');
+            }
+          }, 5000);
+        }
 
       } catch (error) {
         console.error('Error starting chat:', error);
