@@ -2,138 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Agent Directory - Agent to Agent Chat</title>
+  <title>Agent to Agent Chat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f4f8;
-      padding: 20px;
-      margin: 0;
-    }
-
-    .agent-container {
-      max-width: 450px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      padding: 25px;
-      margin: 0 auto;
-    }
-
-    h2 {
-      margin-bottom: 15px;
-      color: #2c3e50;
-      text-align: center;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 5px;
-      color: #34495e;
-      font-weight: bold;
-    }
-
+    body { font-family: Arial, sans-serif; background: #f0f4f8; padding: 20px; margin: 0; }
+    .agent-container { max-width: 450px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 25px; margin: auto; }
+    h2 { margin-bottom: 15px; color: #2c3e50; text-align: center; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; color: #34495e; font-weight: bold; }
     select, button, input {
-      width: 100%;
-      padding: 12px;
-      font-size: 1rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
+      width: 100%; padding: 12px; font-size: 1rem; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;
     }
-
-    select:focus, input:focus {
-      outline: none;
-      border-color: #2c82c9;
-      box-shadow: 0 0 5px rgba(44, 130, 201, 0.3);
-    }
-
+    select:focus, input:focus { outline: none; border-color: #2c82c9; box-shadow: 0 0 5px rgba(44,130,201,0.3); }
     button {
-      background-color: #2c82c9;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-      border: none;
-      margin-top: 10px;
+      background-color: #2c82c9; color: white; cursor: pointer; transition: background-color 0.2s ease;
+      border: none; margin-top: 10px;
     }
-
-    button:hover {
-      background-color: #226ba3;
-    }
-
-    button:disabled {
-      background-color: #bdc3c7;
-      cursor: not-allowed;
-    }
-
-    .loading {
-      text-align: center;
-      color: #7f8c8d;
-      font-style: italic;
-    }
-
-    .error {
-      color: #e74c3c;
-      text-align: center;
-      margin-top: 10px;
-    }
-
-    .success {
-      color: #27ae60;
-      text-align: center;
-      margin-top: 10px;
-    }
-
-    .agent-info {
-      background-color: #ecf0f1;
-      padding: 10px;
-      border-radius: 5px;
-      margin-top: 10px;
-      display: none;
-    }
+    button:hover { background-color: #226ba3; }
+    button:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+    .agent-info { background: #ecf0f1; padding: 10px; border-radius: 5px; margin-top: 10px; display: none; }
+    .error { color: #e74c3c; text-align: center; margin-top: 10px; }
+    .success { color: #27ae60; text-align: center; margin-top: 10px; }
   </style>
 </head>
 
 <!-- Connect Widget Script -->
-<!-- <script type="text/javascript">
-  (function(w, d, x, id){
-    s=d.createElement('script');
-    s.src='https://sharecare-hds-dev-p3f.my.connect.aws/connectwidget/static/amazon-connect-chat-interface-client.js';
-    s.async=1;
-    s.id=id;
-    d.getElementsByTagName('head')[0].appendChild(s);
-    w[x] = w[x] || function() { (w[x].ac = w[x].ac || []).push(arguments) };
-  })(window, document, 'amazon_connect', '51bb78eb-2024-4bab-a426-c3ca21e14331');
-
-  amazon_connect('snippetId', 'QVFJREFIaFg3VVJ2dFRXb2IrUUdndUkvUzRJMnRnQ1NJL3Erc1JKT0lFQ3lCQlNlUEFFSnBlREpsTldscUlya3hNbjNkYTJ4QUFBQmJqQnNCZ2txaGtpRzl3MEJCd2FnWHpCZEFnRUFNRmdHQ1NxR1NJYjNEUUVIQVRBZUJnbGdoa2dCWlFNRUFTNHdFUVFNNHRpTGthdExjVTRENmI3dUFnRVFnQ3Z3bHNhYkx6THBEM3dFN2JOWFkzZEtuVHJGZ1JWVnM3Sk5lOW5Mb2oxNFk0bUxURXRHRG02b1c4Wmk6OkthQ1pySzRxaFF4OEJDd3RYazUreTQyTVc0R2x3ZnJUQmdmejBhTG5vOXZvN25Pc3ZlNmZ1SmxtWWRZa09wc2dITkVDRDIxbVdBazBzczFKSzZ2ZncvakRTczRFTHUwV2hlUTk2UU5QbzJacnJMS294NjFCeXNXT1ZDOVNFNHlvbHpvSjdjcnJLL0V1YytsamZwSVRLcXpIZlcwQTlGcz0=');
-
-  amazon_connect('supportedMessagingContentTypes', [
-    'text/plain',
-    'text/markdown',
-    'application/vnd.amazonaws.connect.message.interactive',
-    'application/vnd.amazonaws.connect.message.interactive.response'
-  ]);
-</script> -->
-
-
-
 <script type="text/javascript">
   (function(w, d, x, id){
-    s=d.createElement('script');
-    s.src='https://sharecare-hds-dev-p3f.my.connect.aws/connectwidget/static/amazon-connect-chat-interface-client.js';
-    s.async=1;
-    s.id=id;
+    var s = d.createElement('script');
+    s.src = 'https://sharecare-hds-dev-p3f.my.connect.aws/connectwidget/static/amazon-connect-chat-interface-client.js';
+    s.async = 1;
+    s.id = id;
     d.getElementsByTagName('head')[0].appendChild(s);
-    w[x] =  w[x] || function() { (w[x].ac = w[x].ac || []).push(arguments) };
-  })(window, document, 'amazon_connect', '51bb78eb-2024-4bab-a426-c3ca21e14331');
-  amazon_connect('styles', { iconType: 'CHAT', openChat: { color: '#ffffff', backgroundColor: '#00BFA5' }, closeChat: { color: '#ffffff', backgroundColor: '#00BFA5'} });
-  amazon_connect('snippetId', 'QVFJREFIaFg3VVJ2dFRXb2IrUUdndUkvUzRJMnRnQ1NJL3Erc1JKT0lFQ3lCQlNlUEFFSnBlREpsTldscUlya3hNbjNkYTJ4QUFBQWJqQnNCZ2txaGtpRzl3MEJCd2FnWHpCZEFnRUFNRmdHQ1NxR1NJYjNEUUVIQVRBZUJnbGdoa2dCWlFNRUFTNHdFUVFNNHRpTGthdExjVTRENmI3dUFnRVFnQ3Z3bHNhYkx6THBEM3dFN2JOWFkzZEtuVHJGZ1JWVnM3Sk5lOW5Mb2oxNFk0bUxURXRHRG02b1c4Wmk6OkthQ1pySzRxaFF4OEJDd3RYazUreTQyTVc0R2x3ZnJUQmdmejBhTG5vOXZvN25Pc3ZlNmZ1SmxtWWRZa09wc2dITkVDRDIxbVdBazBzczFKSzZ2ZncvakRTczRFTHUwV2hlUTk2UU5QbzJacnJMS294NjFCeXNXT1ZDOVNFNHlvbHpvSjdjcnJLL0V1YytsamZwSVRLcXpIZlcwQTlGcz0=');
-  amazon_connect('supportedMessagingContentTypes', [ 'text/plain', 'text/markdown', 'application/vnd.amazonaws.connect.message.interactive', 'application/vnd.amazonaws.connect.message.interactive.response' ]);
+    w[x] = w[x] || function() { (w[x].ac = w[x].ac || []).push(arguments) };
+  })(window, document, 'amazon_connect', 'connect-script');
+
+  amazon_connect('snippetId', 'YOUR_SNIPPET_ID_HERE');
+  amazon_connect('supportedMessagingContentTypes', [ 'text/plain', 'text/markdown' ]);
 </script>
 
 <body>
@@ -156,129 +61,99 @@
       <strong>Selected Agent:</strong> <span id="selectedAgentName"></span>
     </div>
 
-    <button id="startChatBtn" onclick="startChat()" disabled>Start Agent Chat</button>
+    <button id="startChatBtn" onclick="initiateAgentChat()" disabled>Start Agent Chat</button>
     
     <div id="statusMessage"></div>
   </div>
 
   <script>
     const apiUrl = 'https://9dpiz8q0bh.execute-api.us-east-1.amazonaws.com/dev';
-    
     let selectedAgent = '';
     let agentList = [];
 
-    // Load agents from Lambda via API Gateway
     async function loadAgents() {
       try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        agentList = data.agents || data; // Handle both array and object responses
-        
+        const res = await fetch(apiUrl);
+        const data = await res.json();
+        agentList = data.agents || data;
+
         const select = document.getElementById('agentSelect');
         select.innerHTML = '<option disabled selected>Select target agent</option>';
-        
         agentList.forEach(agent => {
           const option = document.createElement('option');
-          option.value = agent.username || agent;
-          option.textContent = agent.displayName || agent.username || agent;
-          if (agent.routingProfileId) {
-            option.setAttribute('data-routing-profile', agent.routingProfileId);
-          }
-          if (agent.userId) {
-            option.setAttribute('data-user-id', agent.userId);
-          }
+          option.value = agent.username;
+          option.textContent = agent.displayName || agent.username;
+          option.dataset.routingProfile = agent.routingProfileId || '';
+          option.dataset.userId = agent.userId || '';
           select.appendChild(option);
         });
 
         select.addEventListener('change', handleAgentSelection);
-        showStatus('Agents loaded successfully', 'success');
-        
-      } catch (error) {
-        console.error('Error loading agents:', error);
-        document.getElementById('agentSelect').innerHTML = 
-          '<option disabled>Error loading agent list</option>';
-        showStatus('Failed to load agents. Please refresh the page.', 'error');
+        setStatus('Agents loaded.', 'success');
+      } catch (err) {
+        console.error(err);
+        setStatus('Failed to load agents.', 'error');
       }
     }
 
     function handleAgentSelection(e) {
       selectedAgent = e.target.value;
       const selectedOption = e.target.selectedOptions[0];
-      
-      if (selectedAgent) {
-        document.getElementById('selectedAgentName').textContent = selectedOption.textContent;
-        document.getElementById('agentInfo').style.display = 'block';
-        document.getElementById('startChatBtn').disabled = false;
-        showStatus('', '');
-      }
+      document.getElementById('selectedAgentName').textContent = selectedOption.textContent;
+      document.getElementById('agentInfo').style.display = 'block';
+      document.getElementById('startChatBtn').disabled = false;
     }
 
-    function showStatus(message, type) {
-      const statusDiv = document.getElementById('statusMessage');
-      statusDiv.textContent = message;
-      statusDiv.className = type;
+    function waitForWidgetReady(callback) {
+      const interval = setInterval(() => {
+        if (typeof window.amazon_connect === 'function') {
+          clearInterval(interval);
+          callback();
+        }
+      }, 100);
     }
 
-    // Trigger Amazon Connect Chat with dynamic session attributes
-    function startChat() {
+    function initiateAgentChat() {
       const initiatingAgent = document.getElementById('initiatingAgent').value.trim();
-      
-      if (!initiatingAgent) {
-        showStatus('Please enter your agent name', 'error');
-        return;
-      }
-      
-      if (!selectedAgent) {
-        showStatus('Please select a target agent', 'error');
+      const selectedOption = document.getElementById('agentSelect').selectedOptions[0];
+
+      if (!initiatingAgent || !selectedAgent) {
+        setStatus('Please fill in all fields.', 'error');
         return;
       }
 
-      const selectedOption = document.getElementById('agentSelect').selectedOptions[0];
-      
-      // Set session attributes that will be available in your Connect flow
       const sessionAttributes = {
-        'target_agent_username': selectedAgent,
-        'target_agent_display_name': selectedOption.textContent,
-        'initiating_agent': initiatingAgent,
-        'chat_type': 'agent_to_agent',
-        'routing_profile_id': selectedOption.getAttribute('data-routing-profile') || '',
-        'target_user_id': selectedOption.getAttribute('data-user-id') || '',
-        'timestamp': new Date().toISOString()
+        target_agent_username: selectedAgent,
+        target_agent_display_name: selectedOption.textContent,
+        initiating_agent: initiatingAgent,
+        routing_profile_id: selectedOption.dataset.routingProfile || '',
+        target_user_id: selectedOption.dataset.userId || '',
+        chat_type: 'agent_to_agent',
+        timestamp: new Date().toISOString()
       };
 
-      console.log('Setting session attributes:', sessionAttributes);
+      waitForWidgetReady(() => {
+        amazon_connect('sessionAttributes', sessionAttributes);
+        amazon_connect('contactAttributes', {
+          TargetAgent: selectedAgent,
+          InitiatingAgent: initiatingAgent,
+          ChatType: 'AgentToAgent'
+        });
 
-      // Set the session attributes
-      amazon_connect('sessionAttributes', sessionAttributes);
-
-      // Set contact attributes (alternative method, use both for reliability)
-      amazon_connect('contactAttributes', {
-        'TargetAgent': selectedAgent,
-        'InitiatingAgent': initiatingAgent,
-        'ChatType': 'AgentToAgent'
+        setStatus('Opening chat...', 'success');
+        setTimeout(() => {
+          amazon_connect('openChat');
+        }, 300); // delay ensures attributes are processed
       });
-
-      showStatus('Starting chat...', 'success');
-      
-      // Open the chat widget
-      amazon_connect('openChat');
     }
 
-    // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-      loadAgents();
-      
-      // Enable enter key for initiating agent input
-      document.getElementById('initiatingAgent').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && selectedAgent && this.value.trim()) {
-          startChat();
-        }
-      });
-    });
+    function setStatus(msg, type) {
+      const div = document.getElementById('statusMessage');
+      div.textContent = msg;
+      div.className = type;
+    }
+
+    document.addEventListener('DOMContentLoaded', loadAgents);
   </script>
 </body>
 </html>
