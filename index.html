@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Agent Directory - Fixed Widget</title>
+  <title>Widget Diagnostic Test</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
@@ -12,8 +12,8 @@
       margin: 0;
     }
 
-    .agent-container {
-      max-width: 450px;
+    .container {
+      max-width: 600px;
       background: white;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -22,97 +22,69 @@
     }
 
     h2 {
-      margin-bottom: 15px;
       color: #2c3e50;
       text-align: center;
     }
 
-    .form-group {
-      margin-bottom: 15px;
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      background-color: #f8f9fa;
     }
 
-    label {
-      display: block;
-      margin-bottom: 5px;
-      color: #34495e;
-      font-weight: bold;
-    }
-
-    select, button, input {
-      width: 100%;
-      padding: 12px;
-      font-size: 1rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
-
-    select:focus, input:focus {
-      outline: none;
-      border-color: #2c82c9;
-      box-shadow: 0 0 5px rgba(44, 130, 201, 0.3);
+    .test-section h3 {
+      margin-top: 0;
+      color: #495057;
     }
 
     button {
-      background-color: #2c82c9;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
+      padding: 10px 15px;
+      margin: 5px;
       border: none;
-      margin-top: 10px;
-    }
-
-    button:hover {
-      background-color: #226ba3;
-    }
-
-    button:disabled {
-      background-color: #bdc3c7;
-      cursor: not-allowed;
-    }
-
-    .status {
-      margin-top: 10px;
-      padding: 10px;
       border-radius: 5px;
+      cursor: pointer;
+      color: white;
     }
 
-    .error {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
+    .btn-primary { background-color: #007bff; }
+    .btn-success { background-color: #28a745; }
+    .btn-warning { background-color: #ffc107; color: #212529; }
+    .btn-danger { background-color: #dc3545; }
 
-    .success {
-      background-color: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
-
-    .info {
-      background-color: #d1ecf1;
-      color: #0c5460;
-      border: 1px solid #bee5eb;
-    }
-
-    .agent-info {
-      background-color: #ecf0f1;
-      padding: 10px;
+    .debug-log {
+      background-color: #2d3748;
+      color: #e2e8f0;
+      padding: 15px;
       border-radius: 5px;
-      margin-top: 10px;
-      display: none;
-    }
-
-    .debug-info {
-      background-color: #f8f9fa;
-      padding: 10px;
-      border-radius: 5px;
-      margin-top: 15px;
       font-family: monospace;
       font-size: 12px;
-      max-height: 150px;
+      max-height: 300px;
       overflow-y: auto;
-      border: 1px solid #dee2e6;
+      margin-top: 15px;
+      white-space: pre-wrap;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .status-red { background-color: #dc3545; }
+    .status-green { background-color: #28a745; }
+    .status-yellow { background-color: #ffc107; }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
     }
   </style>
 </head>
@@ -124,255 +96,336 @@
     s.src='https://sharecare-hds-dev-p3f.my.connect.aws/connectwidget/static/amazon-connect-chat-interface-client.js';
     s.async=1;
     s.id=id;
+    s.onload = function() {
+      console.log('Widget script loaded successfully');
+      window.widgetScriptLoaded = true;
+    };
+    s.onerror = function() {
+      console.error('Failed to load widget script');
+      window.widgetScriptError = true;
+    };
     d.getElementsByTagName('head')[0].appendChild(s);
-    w[x] =  w[x] || function() { (w[x].ac = w[x].ac || []).push(arguments) };
+    w[x] = w[x] || function() { (w[x].ac = w[x].ac || []).push(arguments) };
   })(window, document, 'amazon_connect', '51bb78eb-2024-4bab-a426-c3ca21e14331');
 </script>
 
 <body>
-  <div class="agent-container">
-    <h2>Agent to Agent Chat</h2>
+  <div class="container">
+    <h2>Amazon Connect Widget Diagnostic</h2>
     
-    <div class="form-group">
-      <label for="initiatingAgent">Your Agent Name:</label>
-      <input type="text" id="initiatingAgent" placeholder="Enter your agent name" />
+    <!-- Test Section 1: Widget Loading -->
+    <div class="test-section">
+      <h3><span id="test1-status" class="status-indicator status-yellow"></span>Test 1: Widget Script Loading</h3>
+      <p>Status: <span id="test1-result">Checking...</span></p>
+      <button class="btn-primary" onclick="test1_checkWidgetScript()">Check Widget Script</button>
     </div>
 
-    <div class="form-group">
-      <label for="agentSelect">Target Agent:</label>
-      <select id="agentSelect">
-        <option disabled selected>Loading agents...</option>
-      </select>
+    <!-- Test Section 2: Widget Function -->
+    <div class="test-section">
+      <h3><span id="test2-status" class="status-indicator status-yellow"></span>Test 2: Widget Function Availability</h3>
+      <p>Status: <span id="test2-result">Not tested</span></p>
+      <button class="btn-primary" onclick="test2_checkWidgetFunction()">Check Widget Function</button>
     </div>
 
-    <div class="agent-info" id="agentInfo">
-      <strong>Selected Agent:</strong> <span id="selectedAgentName"></span>
+    <!-- Test Section 3: Widget Configuration -->
+    <div class="test-section">
+      <h3><span id="test3-status" class="status-indicator status-yellow"></span>Test 3: Widget Configuration</h3>
+      <p>Status: <span id="test3-result">Not tested</span></p>
+      <button class="btn-primary" onclick="test3_configureWidget()">Configure Widget</button>
     </div>
 
-    <button id="startChatBtn" onclick="startChat()" disabled>Start Agent Chat</button>
-    
-    <div id="statusMessage"></div>
-    <div class="debug-info" id="debugInfo">Debug info will appear here...</div>
+    <!-- Test Section 4: Basic Widget Open -->
+    <div class="test-section">
+      <h3><span id="test4-status" class="status-indicator status-yellow"></span>Test 4: Basic Widget Open (No Attributes)</h3>
+      <p>Status: <span id="test4-result">Not tested</span></p>
+      <button class="btn-warning" onclick="test4_openBasicWidget()">Open Widget (Basic)</button>
+    </div>
+
+    <!-- Test Section 5: Widget with Session Attributes -->
+    <div class="test-section">
+      <h3><span id="test5-status" class="status-indicator status-yellow"></span>Test 5: Widget with Session Attributes</h3>
+      <p>Status: <span id="test5-result">Not tested</span></p>
+      <div>
+        <label>Your Agent Name:</label>
+        <input type="text" id="agentName" placeholder="Enter your agent name" value="TestAgent">
+        
+        <label>Target Agent:</label>
+        <select id="targetAgent">
+          <option value="Agent1">Agent1</option>
+          <option value="Agent2">Agent2</option>
+          <option value="Agent3">Agent3</option>
+        </select>
+      </div>
+      <button class="btn-success" onclick="test5_openWithAttributes()">Open Widget (With Attributes)</button>
+    </div>
+
+    <!-- Test Section 6: DOM Inspection -->
+    <div class="test-section">
+      <h3><span id="test6-status" class="status-indicator status-yellow"></span>Test 6: DOM Widget Elements</h3>
+      <p>Status: <span id="test6-result">Not tested</span></p>
+      <button class="btn-primary" onclick="test6_inspectDOM()">Inspect Widget DOM</button>
+    </div>
+
+    <!-- Debug Log -->
+    <div class="debug-log" id="debugLog">Diagnostic log will appear here...\n</div>
   </div>
 
   <script>
-    // Debug logging
-    function debugLog(message) {
+    function debugLog(message, type = 'info') {
       const timestamp = new Date().toLocaleTimeString();
-      const debugDiv = document.getElementById('debugInfo');
-      debugDiv.innerHTML += `[${timestamp}] ${message}\n`;
-      debugDiv.scrollTop = debugDiv.scrollHeight;
+      const logElement = document.getElementById('debugLog');
+      const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : '📝';
+      const newMessage = `[${timestamp}] ${prefix} ${message}\n`;
+      logElement.textContent += newMessage;
+      logElement.scrollTop = logElement.scrollHeight;
       console.log(`[${timestamp}] ${message}`);
     }
 
-    // Initialize widget after script loads
-    function initializeWidget() {
-      debugLog('Initializing Amazon Connect widget...');
+    function setTestStatus(testId, status, message) {
+      const statusElement = document.getElementById(`${testId}-status`);
+      const resultElement = document.getElementById(`${testId}-result`);
       
+      statusElement.className = `status-indicator status-${status}`;
+      resultElement.textContent = message;
+    }
+
+    // Test 1: Check if widget script loaded
+    function test1_checkWidgetScript() {
+      debugLog('Running Test 1: Widget Script Loading');
+      
+      if (window.widgetScriptError) {
+        setTestStatus('test1', 'red', 'Script failed to load');
+        debugLog('Widget script failed to load', 'error');
+        return;
+      }
+      
+      if (window.widgetScriptLoaded) {
+        setTestStatus('test1', 'green', 'Script loaded successfully');
+        debugLog('Widget script loaded successfully', 'success');
+      } else {
+        setTestStatus('test1', 'yellow', 'Script loading...');
+        debugLog('Widget script still loading...', 'warning');
+        
+        // Check again in 2 seconds
+        setTimeout(() => {
+          if (window.widgetScriptLoaded) {
+            setTestStatus('test1', 'green', 'Script loaded successfully');
+            debugLog('Widget script loaded successfully (delayed)', 'success');
+          } else {
+            setTestStatus('test1', 'red', 'Script failed to load');
+            debugLog('Widget script failed to load after timeout', 'error');
+          }
+        }, 2000);
+      }
+    }
+
+    // Test 2: Check if amazon_connect function is available
+    function test2_checkWidgetFunction() {
+      debugLog('Running Test 2: Widget Function Availability');
+      
+      if (typeof amazon_connect === 'function') {
+        setTestStatus('test2', 'green', 'amazon_connect function available');
+        debugLog('amazon_connect function is available', 'success');
+        
+        // Check if function queue exists
+        if (amazon_connect.ac && Array.isArray(amazon_connect.ac)) {
+          debugLog(`Function queue has ${amazon_connect.ac.length} pending calls`, 'info');
+        }
+      } else {
+        setTestStatus('test2', 'red', 'amazon_connect function not available');
+        debugLog('amazon_connect function is NOT available', 'error');
+        debugLog('Type of amazon_connect: ' + typeof amazon_connect, 'info');
+      }
+    }
+
+    // Test 3: Configure widget
+    function test3_configureWidget() {
+      debugLog('Running Test 3: Widget Configuration');
+      
+      if (typeof amazon_connect !== 'function') {
+        setTestStatus('test3', 'red', 'Widget function not available');
+        debugLog('Cannot configure - widget function not available', 'error');
+        return;
+      }
+
       try {
-        // Configure widget styles
+        // Configure styles
         amazon_connect('styles', { 
           iconType: 'CHAT', 
           openChat: { color: '#ffffff', backgroundColor: '#00BFA5' }, 
           closeChat: { color: '#ffffff', backgroundColor: '#00BFA5'} 
         });
-        
+        debugLog('Widget styles configured', 'success');
+
         // Set snippet ID
         amazon_connect('snippetId', 'QVFJREFIaFg3VVJ2dFRXb2IrUUdndUkvUzRJMnRnQ1NJL3Erc1JKT0lFQ3lCQlNlUEFFSnBlREpsTldscUlya3hNbjNkYTJ4QUFBQWJqQnNCZ2txaGtpRzl3MEJCd2FnWHpCZEFnRUFNRmdHQ1NxR1NJYjNEUUVIQVRBZUJnbGdoa2dCWlFNRUFTNHdFUVFNNHRpTGthdExjVTRENmI3dUFnRVFnQ3Z3bHNhYkx6THBEM3dFN2JOWFkzZEtuVHJGZ1JWVnM3Sk5lOW5Mb2oxNFk0bUxURXRHRG02b1c4Wmk6OkthQ1pySzRxaFF4OEJDd3RYazUreTQyTVc0R2x3ZnJUQmdmejBhTG5vOXZvN25Pc3ZlNmZ1SmxtWWRZa09wc2dITkVDRDIxbVdBazBzczFKSzZ2ZncvakRTczRFTHUwV2hlUTk2UU5QbzJacnJMS294NjFCeXNXT1ZDOVNFNHlvbHpvSjdjcnJLL0V1YytsamZwSVRLcXpIZlcwQTlGcz0=');
-        
-        // Set supported messaging content types
+        debugLog('Snippet ID configured', 'success');
+
+        // Set supported content types
         amazon_connect('supportedMessagingContentTypes', [ 
           'text/plain', 
           'text/markdown', 
           'application/vnd.amazonaws.connect.message.interactive', 
           'application/vnd.amazonaws.connect.message.interactive.response' 
         ]);
-        
-        debugLog('✅ Widget configured successfully');
-        
-        // Hide the default widget button (since we're using our own button)
-        hideDefaultWidget();
-        
+        debugLog('Content types configured', 'success');
+
+        setTestStatus('test3', 'green', 'Widget configured successfully');
+        debugLog('Widget configuration completed', 'success');
+
       } catch (error) {
-        debugLog('❌ Error configuring widget: ' + error.message);
+        setTestStatus('test3', 'red', 'Configuration failed: ' + error.message);
+        debugLog('Widget configuration failed: ' + error.message, 'error');
       }
     }
 
-    // Hide the default widget button
-    function hideDefaultWidget() {
-      // Wait a bit for widget to render, then hide it
-      setTimeout(() => {
-        const widgetButton = document.querySelector('.connect-chat-interface');
-        if (widgetButton) {
-          widgetButton.style.display = 'none';
-          debugLog('Default widget button hidden');
-        }
-      }, 2000);
-    }
-
-    // Wait for widget script to load, then initialize
-    function waitForWidget() {
-      if (typeof amazon_connect === 'function') {
-        debugLog('✅ Amazon Connect widget loaded');
-        initializeWidget();
-      } else {
-        debugLog('Waiting for widget to load...');
-        setTimeout(waitForWidget, 500);
-      }
-    }
-
-    // Start waiting for widget after page loads
-    document.addEventListener('DOMContentLoaded', function() {
-      debugLog('Page loaded, checking for widget...');
-      waitForWidget();
-    });
-
-    // API and agent management
-    const apiUrl = 'https://n90bf8tg42.execute-api.us-east-1.amazonaws.com/AgentToAgentChat';
-    let selectedAgent = '';
-    let agentList = [];
-
-    // Load agents from API
-    async function loadAgents() {
-      debugLog('Loading agents from API...');
-      try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        agentList = data.agents || data;
-        
-        const select = document.getElementById('agentSelect');
-        select.innerHTML = '<option disabled selected>Select target agent</option>';
-        
-        agentList.forEach(agent => {
-          const option = document.createElement('option');
-          option.value = agent.username || agent;
-          option.textContent = agent.displayName || agent.username || agent;
-          if (agent.routingProfileId) {
-            option.setAttribute('data-routing-profile', agent.routingProfileId);
-          }
-          if (agent.userId) {
-            option.setAttribute('data-user-id', agent.userId);
-          }
-          select.appendChild(option);
-        });
-
-        select.addEventListener('change', handleAgentSelection);
-        debugLog(`✅ Loaded ${agentList.length} agents`);
-        showStatus('Agents loaded successfully', 'success');
-        
-      } catch (error) {
-        debugLog('❌ Error loading agents: ' + error.message);
-        document.getElementById('agentSelect').innerHTML = 
-          '<option disabled>Error loading agent list</option>';
-        showStatus('Failed to load agents. Please refresh the page.', 'error');
-      }
-    }
-
-    function handleAgentSelection(e) {
-      selectedAgent = e.target.value;
-      const selectedOption = e.target.selectedOptions[0];
+    // Test 4: Try to open widget without session attributes
+    function test4_openBasicWidget() {
+      debugLog('Running Test 4: Basic Widget Open');
       
-      if (selectedAgent) {
-        document.getElementById('selectedAgentName').textContent = selectedOption.textContent;
-        document.getElementById('agentInfo').style.display = 'block';
-        document.getElementById('startChatBtn').disabled = false;
-        debugLog('Selected agent: ' + selectedAgent);
-        showStatus('', '');
-      }
-    }
-
-    function showStatus(message, type) {
-      const statusDiv = document.getElementById('statusMessage');
-      statusDiv.textContent = message;
-      statusDiv.className = type ? 'status ' + type : '';
-    }
-
-    // MAIN FUNCTION: Start Chat
-    function startChat() {
-      debugLog('🚀 Starting chat...');
-      
-      const initiatingAgent = document.getElementById('initiatingAgent').value.trim();
-      
-      // Validation
-      if (!initiatingAgent) {
-        debugLog('❌ No initiating agent specified');
-        showStatus('Please enter your agent name', 'error');
-        return;
-      }
-      
-      if (!selectedAgent) {
-        debugLog('❌ No target agent selected');
-        showStatus('Please select a target agent', 'error');
-        return;
-      }
-
-      // Check if widget is ready
       if (typeof amazon_connect !== 'function') {
-        debugLog('❌ Widget not ready');
-        showStatus('Widget not loaded. Please refresh the page.', 'error');
+        setTestStatus('test4', 'red', 'Widget function not available');
+        debugLog('Cannot open widget - function not available', 'error');
         return;
       }
 
-      // Get selected agent details
-      const selectedOption = document.getElementById('agentSelect').selectedOptions[0];
-      
-      // Prepare session attributes
-      const sessionAttributes = {
-        'target_agent_username': selectedAgent,
-        'target_agent_display_name': selectedOption.textContent,
-        'initiating_agent': initiatingAgent,
-        'chat_type': 'agent_to_agent',
-        'routing_profile_id': selectedOption.getAttribute('data-routing-profile') || '',
-        'target_user_id': selectedOption.getAttribute('data-user-id') || '',
-        'timestamp': new Date().toISOString()
-      };
+      try {
+        debugLog('Attempting to open widget without attributes...');
+        amazon_connect('openChat');
+        
+        setTestStatus('test4', 'green', 'Open command sent - check if widget appears');
+        debugLog('Widget open command sent successfully', 'success');
+        
+        // Check after 3 seconds if widget appeared
+        setTimeout(() => {
+          test6_inspectDOM();
+        }, 3000);
+        
+      } catch (error) {
+        setTestStatus('test4', 'red', 'Failed to open widget: ' + error.message);
+        debugLog('Failed to open widget: ' + error.message, 'error');
+      }
+    }
 
-      debugLog('📋 Session attributes: ' + JSON.stringify(sessionAttributes, null, 2));
+    // Test 5: Open widget with session attributes
+    function test5_openWithAttributes() {
+      debugLog('Running Test 5: Widget with Session Attributes');
+      
+      const agentName = document.getElementById('agentName').value.trim();
+      const targetAgent = document.getElementById('targetAgent').value;
+      
+      if (!agentName) {
+        setTestStatus('test5', 'red', 'Please enter your agent name');
+        debugLog('Agent name not provided', 'error');
+        return;
+      }
+      
+      if (typeof amazon_connect !== 'function') {
+        setTestStatus('test5', 'red', 'Widget function not available');
+        debugLog('Cannot open widget - function not available', 'error');
+        return;
+      }
 
       try {
-        // Set session attributes BEFORE opening chat
-        debugLog('Setting session attributes...');
+        // Prepare session attributes
+        const sessionAttributes = {
+          'target_agent_username': targetAgent,
+          'initiating_agent': agentName,
+          'chat_type': 'agent_to_agent',
+          'timestamp': new Date().toISOString()
+        };
+
+        debugLog('Session attributes: ' + JSON.stringify(sessionAttributes, null, 2));
+
+        // Set session attributes
         amazon_connect('sessionAttributes', sessionAttributes);
-        
-        // Also set contact attributes for backup
-        debugLog('Setting contact attributes...');
+        debugLog('Session attributes set', 'success');
+
+        // Set contact attributes
         amazon_connect('contactAttributes', {
-          'TargetAgent': selectedAgent,
-          'InitiatingAgent': initiatingAgent,
+          'TargetAgent': targetAgent,
+          'InitiatingAgent': agentName,
           'ChatType': 'AgentToAgent'
         });
+        debugLog('Contact attributes set', 'success');
 
-        // Show loading status
-        showStatus('Opening chat...', 'info');
-        debugLog('📱 Opening chat widget...');
-
-        // IMPORTANT: Small delay to ensure attributes are set
+        // Open widget
+        debugLog('Opening widget with attributes...');
+        amazon_connect('openChat');
+        
+        setTestStatus('test5', 'green', 'Widget opened with attributes');
+        debugLog('Widget with attributes opened successfully', 'success');
+        
+        // Check DOM after 3 seconds
         setTimeout(() => {
-          amazon_connect('openChat');
-          debugLog('✅ Chat open command sent');
-          showStatus('Chat widget should open now', 'success');
-        }, 100);
-
+          test6_inspectDOM();
+        }, 3000);
+        
       } catch (error) {
-        debugLog('❌ Error starting chat: ' + error.message);
-        showStatus('Error starting chat: ' + error.message, 'error');
+        setTestStatus('test5', 'red', 'Failed: ' + error.message);
+        debugLog('Failed to open widget with attributes: ' + error.message, 'error');
       }
     }
 
-    // Initialize agents when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-      loadAgents();
+    // Test 6: Inspect DOM for widget elements
+    function test6_inspectDOM() {
+      debugLog('Running Test 6: DOM Widget Elements Inspection');
       
-      // Enable enter key for agent input
-      document.getElementById('initiatingAgent').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && selectedAgent && this.value.trim()) {
-          startChat();
+      const widgetSelectors = [
+        '.connect-chat-interface',
+        '[id*="connect"]',
+        '[class*="connect"]',
+        '[class*="chat"]',
+        'iframe[src*="connect"]',
+        'div[data-widget]'
+      ];
+
+      let foundElements = [];
+      
+      widgetSelectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        if (elements.length > 0) {
+          foundElements.push(`${selector}: ${elements.length} elements`);
+          elements.forEach((el, index) => {
+            debugLog(`  Element ${index + 1}: ${el.tagName}, classes: ${el.className}, id: ${el.id}`, 'info');
+            debugLog(`  Visible: ${el.offsetWidth > 0 && el.offsetHeight > 0}, Display: ${getComputedStyle(el).display}`, 'info');
+          });
         }
       });
+
+      if (foundElements.length > 0) {
+        setTestStatus('test6', 'green', `Found ${foundElements.length} widget element types`);
+        debugLog('Widget DOM elements found:', 'success');
+        foundElements.forEach(element => {
+          debugLog('  ' + element, 'info');
+        });
+      } else {
+        setTestStatus('test6', 'red', 'No widget elements found in DOM');
+        debugLog('No widget elements found in DOM', 'warning');
+      }
+
+      // Also check for any iframes
+      const iframes = document.querySelectorAll('iframe');
+      if (iframes.length > 0) {
+        debugLog(`Found ${iframes.length} iframes:`, 'info');
+        iframes.forEach((iframe, index) => {
+          debugLog(`  Iframe ${index + 1}: src=${iframe.src}, class=${iframe.className}`, 'info');
+        });
+      }
+    }
+
+    // Auto-run initial tests when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      debugLog('Page loaded - starting automatic diagnostics...');
+      
+      // Run Test 1 immediately
+      setTimeout(() => test1_checkWidgetScript(), 500);
+      
+      // Run Test 2 after 2 seconds
+      setTimeout(() => test2_checkWidgetFunction(), 2000);
+      
+      // Auto-configure widget after 3 seconds
+      setTimeout(() => test3_configureWidget(), 3000);
     });
   </script>
 </body>
