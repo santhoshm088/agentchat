@@ -96,45 +96,20 @@
       margin-top: 10px;
       display: none;
     }
+
+    .debug-info {
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 5px;
+      padding: 10px;
+      margin-top: 15px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      max-height: 200px;
+      overflow-y: auto;
+    }
   </style>
 </head>
-
-<!-- Connect Widget Script -->
-<!-- <script type="text/javascript">
-  (function(w, d, x, id){
-    s=d.createElement('script');
-    s.src='https://sharecare-hds-dev-p3f.my.connect.aws/connectwidget/static/amazon-connect-chat-interface-client.js';
-    s.async=1;
-    s.id=id;
-    d.getElementsByTagName('head')[0].appendChild(s);
-    w[x] = w[x] || function() { (w[x].ac = w[x].ac || []).push(arguments) };
-  })(window, document, 'amazon_connect', '51bb78eb-2024-4bab-a426-c3ca21e14331');
-
-  amazon_connect('snippetId', 'QVFJREFIaFg3VVJ2dFRXb2IrUUdndUkvUzRJMnRnQ1NJL3Erc1JKT0lFQ3lCQlNlUEFFSnBlREpsTldscUlya3hNbjNkYTJ4QUFBQmJqQnNCZ2txaGtpRzl3MEJCd2FnWHpCZEFnRUFNRmdHQ1NxR1NJYjNEUUVIQVRBZUJnbGdoa2dCWlFNRUFTNHdFUVFNNHRpTGthdExjVTRENmI3dUFnRVFnQ3Z3bHNhYkx6THBEM3dFN2JOWFkzZEtuVHJGZ1JWVnM3Sk5lOW5Mb2oxNFk0bUxURXRHRG02b1c4Wmk6OkthQ1pySzRxaFF4OEJDd3RYazUreTQyTVc0R2x3ZnJUQmdmejBhTG5vOXZvN25Pc3ZlNmZ1SmxtWWRZa09wc2dITkVDRDIxbVdBazBzczFKSzZ2ZncvakRTczRFTHUwV2hlUTk2UU5QbzJacnJMS294NjFCeXNXT1ZDOVNFNHlvbHpvSjdjcnJLL0V1YytsamZwSVRLcXpIZlcwQTlGcz0=');
-
-  amazon_connect('supportedMessagingContentTypes', [
-    'text/plain',
-    'text/markdown',
-    'application/vnd.amazonaws.connect.message.interactive',
-    'application/vnd.amazonaws.connect.message.interactive.response'
-  ]);
-</script> -->
-
-
-
-<script type="text/javascript">
-  (function(w, d, x, id){
-    s=d.createElement('script');
-    s.src='https://sharecare-hds-dev-p3f.my.connect.aws/connectwidget/static/amazon-connect-chat-interface-client.js';
-    s.async=1;
-    s.id=id;
-    d.getElementsByTagName('head')[0].appendChild(s);
-    w[x] =  w[x] || function() { (w[x].ac = w[x].ac || []).push(arguments) };
-  })(window, document, 'amazon_connect', '51bb78eb-2024-4bab-a426-c3ca21e14331');
-  amazon_connect('styles', { iconType: 'CHAT', openChat: { color: '#ffffff', backgroundColor: '#00BFA5' }, closeChat: { color: '#ffffff', backgroundColor: '#00BFA5'} });
-  amazon_connect('snippetId', 'QVFJREFIaFg3VVJ2dFRXb2IrUUdndUkvUzRJMnRnQ1NJL3Erc1JKT0lFQ3lCQlNlUEFFSnBlREpsTldscUlya3hNbjNkYTJ4QUFBQWJqQnNCZ2txaGtpRzl3MEJCd2FnWHpCZEFnRUFNRmdHQ1NxR1NJYjNEUUVIQVRBZUJnbGdoa2dCWlFNRUFTNHdFUVFNNHRpTGthdExjVTRENmI3dUFnRVFnQ3Z3bHNhYkx6THBEM3dFN2JOWFkzZEtuVHJGZ1JWVnM3Sk5lOW5Mb2oxNFk0bUxURXRHRG02b1c4Wmk6OkthQ1pySzRxaFF4OEJDd3RYazUreTQyTVc0R2x3ZnJUQmdmejBhTG5vOXZvN25Pc3ZlNmZ1SmxtWWRZa09wc2dITkVDRDIxbVdBazBzczFKSzZ2ZncvakRTczRFTHUwV2hlUTk2UU5QbzJacnJMS294NjFCeXNXT1ZDOVNFNHlvbHpvSjdjcnJLL0V1YytsamZwSVRLcXpIZlcwQTlGcz0=');
-  amazon_connect('supportedMessagingContentTypes', [ 'text/plain', 'text/markdown', 'application/vnd.amazonaws.connect.message.interactive', 'application/vnd.amazonaws.connect.message.interactive.response' ]);
-</script>
 
 <body>
   <div class="agent-container">
@@ -159,24 +134,76 @@
     <button id="startChatBtn" onclick="startChat()" disabled>Start Agent Chat</button>
     
     <div id="statusMessage"></div>
+    
+    <!-- Debug information -->
+    <div class="debug-info" id="debugInfo" style="display: none;">
+      <strong>Debug Information:</strong>
+      <div id="debugContent"></div>
+    </div>
   </div>
+
+  <!-- Amazon Connect Widget Script -->
+  <script type="text/javascript">
+    (function(w, d, x, id){
+      s=d.createElement('script');
+      s.src='https://sharecare-hds-dev-p3f.my.connect.aws/connectwidget/static/amazon-connect-chat-interface-client.js';
+      s.async=1;
+      s.id=id;
+      d.getElementsByTagName('head')[0].appendChild(s);
+      w[x] = w[x] || function() { (w[x].ac = w[x].ac || []).push(arguments) };
+    })(window, document, 'amazon_connect', '51bb78eb-2024-4bab-a426-c3ca21e14331');
+
+    // Wait for script to load before configuring
+    window.addEventListener('load', function() {
+      // Configure widget styles
+      amazon_connect('styles', { 
+        iconType: 'CHAT', 
+        openChat: { color: '#ffffff', backgroundColor: '#00BFA5' }, 
+        closeChat: { color: '#ffffff', backgroundColor: '#00BFA5'} 
+      });
+
+      // Set snippet ID
+      amazon_connect('snippetId', 'QVFJREFIaFg3VVJ2dFRXb2IrUUdndUkvUzRJMnRnQ1NJL3Erc1JKT0lFQ3lCQlNlUEFFSnBlREpsTldscUlya3hNbjNkYTJ4QUFBQWJqQnNCZ2txaGtpRzl3MEJCd2FnWHpCZEFnRUFNRmdHQ1NxR1NJYjNEUUVIQVRBZUJnbGdoa2dCWlFNRUFTNHdFUVFNNHRpTGthdExjVTRENmI3dUFnRVFnQ3Z3bHNhYkx6THBEM3dFN2JOWFkzZEtuVHJGZ1JWVnM3Sk5lOW5Mb2oxNFk0bUxURXRHRG02b1c4Wmk6OkthQ1pySzRxaFF4OEJDd3RYazUreTQyTVc0R2x3ZnJUQmdmejBhTG5vOXZvN25Pc3ZlNmZ1SmxtWWRZa09wc2dITkVDRDIxbVdBazBzczFKSzZ2ZncvakRTczRFTHUwV2hlUTk2UU5QbzJacnJMS294NjFCeXNXT1ZDOVNFNHlvbHpvSjdjcnJLL0V1YytsamZwSVRLcXpIZlcwQTlGcz0=');
+
+      // Set supported content types
+      amazon_connect('supportedMessagingContentTypes', [ 
+        'text/plain', 
+        'text/markdown', 
+        'application/vnd.amazonaws.connect.message.interactive', 
+        'application/vnd.amazonaws.connect.message.interactive.response' 
+      ]);
+
+      console.log('Amazon Connect widget initialized');
+    });
+  </script>
 
   <script>
     const apiUrl = 'https://9dpiz8q0bh.execute-api.us-east-1.amazonaws.com/dev';
     
     let selectedAgent = '';
     let agentList = [];
+    let widgetInitialized = false;
+
+    // Debug function
+    function addDebugInfo(message) {
+      const debugDiv = document.getElementById('debugContent');
+      const timestamp = new Date().toLocaleTimeString();
+      debugDiv.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+      document.getElementById('debugInfo').style.display = 'block';
+      console.log(`[Debug] ${message}`);
+    }
 
     // Load agents from Lambda via API Gateway
     async function loadAgents() {
       try {
+        addDebugInfo('Loading agents from API...');
         const response = await fetch(apiUrl);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
-        agentList = data.agents || data; // Handle both array and object responses
+        agentList = data.agents || data;
         
         const select = document.getElementById('agentSelect');
         select.innerHTML = '<option disabled selected>Select target agent</option>';
@@ -196,12 +223,14 @@
 
         select.addEventListener('change', handleAgentSelection);
         showStatus('Agents loaded successfully', 'success');
+        addDebugInfo(`Loaded ${agentList.length} agents successfully`);
         
       } catch (error) {
         console.error('Error loading agents:', error);
         document.getElementById('agentSelect').innerHTML = 
           '<option disabled>Error loading agent list</option>';
         showStatus('Failed to load agents. Please refresh the page.', 'error');
+        addDebugInfo(`Error loading agents: ${error.message}`);
       }
     }
 
@@ -214,6 +243,7 @@
         document.getElementById('agentInfo').style.display = 'block';
         document.getElementById('startChatBtn').disabled = false;
         showStatus('', '');
+        addDebugInfo(`Selected agent: ${selectedAgent}`);
       }
     }
 
@@ -223,8 +253,8 @@
       statusDiv.className = type;
     }
 
-    // Trigger Amazon Connect Chat with dynamic session attributes
-    function startChat() {
+    // Start chat with proper attribute setting
+    async function startChat() {
       const initiatingAgent = document.getElementById('initiatingAgent').value.trim();
       
       if (!initiatingAgent) {
@@ -238,38 +268,59 @@
       }
 
       const selectedOption = document.getElementById('agentSelect').selectedOptions[0];
+      const targetUserId = selectedOption.getAttribute('data-user-id') || '';
+      const routingProfileId = selectedOption.getAttribute('data-routing-profile') || '';
       
-      // Set session attributes that will be available in your Connect flow
+      // Prepare attributes for Connect flow
+      const contactAttributes = {
+        'TargetAgentUsername': selectedAgent,
+        'TargetAgentDisplayName': selectedOption.textContent,
+        'InitiatingAgent': initiatingAgent,
+        'ChatType': 'AgentToAgent',
+        'TargetUserId': targetUserId,
+        'RoutingProfileId': routingProfileId,
+        'Timestamp': new Date().toISOString()
+      };
+
       const sessionAttributes = {
         'target_agent_username': selectedAgent,
         'target_agent_display_name': selectedOption.textContent,
         'initiating_agent': initiatingAgent,
         'chat_type': 'agent_to_agent',
-        'routing_profile_id': selectedOption.getAttribute('data-routing-profile') || '',
-        'target_user_id': selectedOption.getAttribute('data-user-id') || '',
+        'target_user_id': targetUserId,
+        'routing_profile_id': routingProfileId,
         'timestamp': new Date().toISOString()
       };
 
-      console.log('Setting session attributes:', sessionAttributes);
+      addDebugInfo(`Setting contact attributes: ${JSON.stringify(contactAttributes)}`);
+      addDebugInfo(`Setting session attributes: ${JSON.stringify(sessionAttributes)}`);
 
-      // Set the session attributes
-      amazon_connect('sessionAttributes', sessionAttributes);
+      try {
+        // Set contact attributes (these will be available in your Connect flow)
+        amazon_connect('contactAttributes', contactAttributes);
+        
+        // Set session attributes (alternative method)
+        amazon_connect('sessionAttributes', sessionAttributes);
 
-      // Set contact attributes (alternative method, use both for reliability)
-      amazon_connect('contactAttributes', {
-        'TargetAgent': selectedAgent,
-        'InitiatingAgent': initiatingAgent,
-        'ChatType': 'AgentToAgent'
-      });
+        showStatus('Opening chat widget...', 'success');
+        addDebugInfo('Attempting to open chat widget');
 
-      showStatus('Starting chat...', 'success');
-      
-      // Open the chat widget
-      amazon_connect('openChat');
+        // Small delay to ensure attributes are set
+        setTimeout(() => {
+          amazon_connect('openChat');
+          addDebugInfo('Chat widget open command sent');
+        }, 500);
+
+      } catch (error) {
+        console.error('Error starting chat:', error);
+        showStatus('Failed to start chat. Please try again.', 'error');
+        addDebugInfo(`Error starting chat: ${error.message}`);
+      }
     }
 
     // Initialize when page loads
     document.addEventListener('DOMContentLoaded', function() {
+      addDebugInfo('Page loaded, initializing...');
       loadAgents();
       
       // Enable enter key for initiating agent input
@@ -278,7 +329,34 @@
           startChat();
         }
       });
+
+      // Check if Amazon Connect widget is ready
+      let checkCount = 0;
+      const checkWidget = setInterval(() => {
+        checkCount++;
+        if (typeof amazon_connect !== 'undefined') {
+          widgetInitialized = true;
+          addDebugInfo('Amazon Connect widget is ready');
+          clearInterval(checkWidget);
+        } else if (checkCount > 20) { // Stop checking after 10 seconds
+          addDebugInfo('Warning: Amazon Connect widget may not be loaded');
+          clearInterval(checkWidget);
+        }
+      }, 500);
     });
+
+    // Listen for widget events (if available)
+    if (typeof amazon_connect !== 'undefined') {
+      amazon_connect('onStartChat', function() {
+        addDebugInfo('Chat started successfully');
+        showStatus('Chat started!', 'success');
+      });
+
+      amazon_connect('onError', function(error) {
+        addDebugInfo(`Widget error: ${JSON.stringify(error)}`);
+        showStatus('Chat widget error occurred', 'error');
+      });
+    }
   </script>
 </body>
 </html>
