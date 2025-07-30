@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Agent Directory - Agent to Agent Chat</title>
+  <title>Agent Directory - Fixed Widget</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
@@ -71,22 +71,28 @@
       cursor: not-allowed;
     }
 
-    .loading {
-      text-align: center;
-      color: #7f8c8d;
-      font-style: italic;
+    .status {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 5px;
     }
 
     .error {
-      color: #e74c3c;
-      text-align: center;
-      margin-top: 10px;
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
     }
 
     .success {
-      color: #27ae60;
-      text-align: center;
-      margin-top: 10px;
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
     }
 
     .agent-info {
@@ -96,10 +102,22 @@
       margin-top: 10px;
       display: none;
     }
+
+    .debug-info {
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 15px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid #dee2e6;
+    }
   </style>
 </head>
 
-<!-- Connect Widget Script -->
+<!-- Your EXACT Connect Widget Script -->
 <script type="text/javascript">
   (function(w, d, x, id){
     s=d.createElement('script');
@@ -107,17 +125,8 @@
     s.async=1;
     s.id=id;
     d.getElementsByTagName('head')[0].appendChild(s);
-    w[x] = w[x] || function() { (w[x].ac = w[x].ac || []).push(arguments) };
+    w[x] =  w[x] || function() { (w[x].ac = w[x].ac || []).push(arguments) };
   })(window, document, 'amazon_connect', '51bb78eb-2024-4bab-a426-c3ca21e14331');
-
-  amazon_connect('snippetId', 'QVFJREFIaFg3VVJ2dFRXb2IrUUdndUkvUzRJMnRnQ1NJL3Erc1JKT0lFQ3lCQlNlUEFFSnBlREpsTldscUlya3hNbjNkYTJ4QUFBQmJqQnNCZ2txaGtpRzl3MEJCd2FnWHpCZEFnRUFNRmdHQ1NxR1NJYjNEUUVIQVRBZUJnbGdoa2dCWlFNRUFTNHdFUVFNNHRpTGthdExjVTRENmI3dUFnRVFnQ3Z3bHNhYkx6THBEM3dFN2JOWFkzZEtuVHJGZ1JWVnM3Sk5lOW5Mb2oxNFk0bUxURXRHRG02b1c4Wmk6OkthQ1pySzRxaFF4OEJDd3RYazUreTQyTVc0R2x3ZnJUQmdmejBhTG5vOXZvN25Pc3ZlNmZ1SmxtWWRZa09wc2dITkVDRDIxbVdBazBzczFKSzZ2ZncvakRTczRFTHUwV2hlUTk2UU5QbzJacnJMS294NjFCeXNXT1ZDOVNFNHlvbHpvSjdjcnJLL0V1YytsamZwSVRLcXpIZlcwQTlGcz0=');
-
-  amazon_connect('supportedMessagingContentTypes', [
-    'text/plain',
-    'text/markdown',
-    'application/vnd.amazonaws.connect.message.interactive',
-    'application/vnd.amazonaws.connect.message.interactive.response'
-  ]);
 </script>
 
 <body>
@@ -143,16 +152,89 @@
     <button id="startChatBtn" onclick="startChat()" disabled>Start Agent Chat</button>
     
     <div id="statusMessage"></div>
+    <div class="debug-info" id="debugInfo">Debug info will appear here...</div>
   </div>
 
   <script>
+    // Debug logging
+    function debugLog(message) {
+      const timestamp = new Date().toLocaleTimeString();
+      const debugDiv = document.getElementById('debugInfo');
+      debugDiv.innerHTML += `[${timestamp}] ${message}\n`;
+      debugDiv.scrollTop = debugDiv.scrollHeight;
+      console.log(`[${timestamp}] ${message}`);
+    }
+
+    // Initialize widget after script loads
+    function initializeWidget() {
+      debugLog('Initializing Amazon Connect widget...');
+      
+      try {
+        // Configure widget styles
+        amazon_connect('styles', { 
+          iconType: 'CHAT', 
+          openChat: { color: '#ffffff', backgroundColor: '#00BFA5' }, 
+          closeChat: { color: '#ffffff', backgroundColor: '#00BFA5'} 
+        });
+        
+        // Set snippet ID
+        amazon_connect('snippetId', 'QVFJREFIaFg3VVJ2dFRXb2IrUUdndUkvUzRJMnRnQ1NJL3Erc1JKT0lFQ3lCQlNlUEFFSnBlREpsTldscUlya3hNbjNkYTJ4QUFBQWJqQnNCZ2txaGtpRzl3MEJCd2FnWHpCZEFnRUFNRmdHQ1NxR1NJYjNEUUVIQVRBZUJnbGdoa2dCWlFNRUFTNHdFUVFNNHRpTGthdExjVTRENmI3dUFnRVFnQ3Z3bHNhYkx6THBEM3dFN2JOWFkzZEtuVHJGZ1JWVnM3Sk5lOW5Mb2oxNFk0bUxURXRHRG02b1c4Wmk6OkthQ1pySzRxaFF4OEJDd3RYazUreTQyTVc0R2x3ZnJUQmdmejBhTG5vOXZvN25Pc3ZlNmZ1SmxtWWRZa09wc2dITkVDRDIxbVdBazBzczFKSzZ2ZncvakRTczRFTHUwV2hlUTk2UU5QbzJacnJMS294NjFCeXNXT1ZDOVNFNHlvbHpvSjdjcnJLL0V1YytsamZwSVRLcXpIZlcwQTlGcz0=');
+        
+        // Set supported messaging content types
+        amazon_connect('supportedMessagingContentTypes', [ 
+          'text/plain', 
+          'text/markdown', 
+          'application/vnd.amazonaws.connect.message.interactive', 
+          'application/vnd.amazonaws.connect.message.interactive.response' 
+        ]);
+        
+        debugLog('✅ Widget configured successfully');
+        
+        // Hide the default widget button (since we're using our own button)
+        hideDefaultWidget();
+        
+      } catch (error) {
+        debugLog('❌ Error configuring widget: ' + error.message);
+      }
+    }
+
+    // Hide the default widget button
+    function hideDefaultWidget() {
+      // Wait a bit for widget to render, then hide it
+      setTimeout(() => {
+        const widgetButton = document.querySelector('.connect-chat-interface');
+        if (widgetButton) {
+          widgetButton.style.display = 'none';
+          debugLog('Default widget button hidden');
+        }
+      }, 2000);
+    }
+
+    // Wait for widget script to load, then initialize
+    function waitForWidget() {
+      if (typeof amazon_connect === 'function') {
+        debugLog('✅ Amazon Connect widget loaded');
+        initializeWidget();
+      } else {
+        debugLog('Waiting for widget to load...');
+        setTimeout(waitForWidget, 500);
+      }
+    }
+
+    // Start waiting for widget after page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      debugLog('Page loaded, checking for widget...');
+      waitForWidget();
+    });
+
+    // API and agent management
     const apiUrl = 'https://n90bf8tg42.execute-api.us-east-1.amazonaws.com/AgentToAgentChat';
-    
     let selectedAgent = '';
     let agentList = [];
 
-    // Load agents from Lambda via API Gateway
+    // Load agents from API
     async function loadAgents() {
+      debugLog('Loading agents from API...');
       try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
@@ -160,7 +242,7 @@
         }
         
         const data = await response.json();
-        agentList = data.agents || data; // Handle both array and object responses
+        agentList = data.agents || data;
         
         const select = document.getElementById('agentSelect');
         select.innerHTML = '<option disabled selected>Select target agent</option>';
@@ -179,10 +261,11 @@
         });
 
         select.addEventListener('change', handleAgentSelection);
+        debugLog(`✅ Loaded ${agentList.length} agents`);
         showStatus('Agents loaded successfully', 'success');
         
       } catch (error) {
-        console.error('Error loading agents:', error);
+        debugLog('❌ Error loading agents: ' + error.message);
         document.getElementById('agentSelect').innerHTML = 
           '<option disabled>Error loading agent list</option>';
         showStatus('Failed to load agents. Please refresh the page.', 'error');
@@ -197,6 +280,7 @@
         document.getElementById('selectedAgentName').textContent = selectedOption.textContent;
         document.getElementById('agentInfo').style.display = 'block';
         document.getElementById('startChatBtn').disabled = false;
+        debugLog('Selected agent: ' + selectedAgent);
         showStatus('', '');
       }
     }
@@ -204,26 +288,39 @@
     function showStatus(message, type) {
       const statusDiv = document.getElementById('statusMessage');
       statusDiv.textContent = message;
-      statusDiv.className = type;
+      statusDiv.className = type ? 'status ' + type : '';
     }
 
-    // Trigger Amazon Connect Chat with dynamic session attributes
+    // MAIN FUNCTION: Start Chat
     function startChat() {
+      debugLog('🚀 Starting chat...');
+      
       const initiatingAgent = document.getElementById('initiatingAgent').value.trim();
       
+      // Validation
       if (!initiatingAgent) {
+        debugLog('❌ No initiating agent specified');
         showStatus('Please enter your agent name', 'error');
         return;
       }
       
       if (!selectedAgent) {
+        debugLog('❌ No target agent selected');
         showStatus('Please select a target agent', 'error');
         return;
       }
 
+      // Check if widget is ready
+      if (typeof amazon_connect !== 'function') {
+        debugLog('❌ Widget not ready');
+        showStatus('Widget not loaded. Please refresh the page.', 'error');
+        return;
+      }
+
+      // Get selected agent details
       const selectedOption = document.getElementById('agentSelect').selectedOptions[0];
       
-      // Set session attributes that will be available in your Connect flow
+      // Prepare session attributes
       const sessionAttributes = {
         'target_agent_username': selectedAgent,
         'target_agent_display_name': selectedOption.textContent,
@@ -234,29 +331,43 @@
         'timestamp': new Date().toISOString()
       };
 
-      console.log('Setting session attributes:', sessionAttributes);
+      debugLog('📋 Session attributes: ' + JSON.stringify(sessionAttributes, null, 2));
 
-      // Set the session attributes
-      amazon_connect('sessionAttributes', sessionAttributes);
+      try {
+        // Set session attributes BEFORE opening chat
+        debugLog('Setting session attributes...');
+        amazon_connect('sessionAttributes', sessionAttributes);
+        
+        // Also set contact attributes for backup
+        debugLog('Setting contact attributes...');
+        amazon_connect('contactAttributes', {
+          'TargetAgent': selectedAgent,
+          'InitiatingAgent': initiatingAgent,
+          'ChatType': 'AgentToAgent'
+        });
 
-      // Set contact attributes (alternative method, use both for reliability)
-      amazon_connect('contactAttributes', {
-        'TargetAgent': selectedAgent,
-        'InitiatingAgent': initiatingAgent,
-        'ChatType': 'AgentToAgent'
-      });
+        // Show loading status
+        showStatus('Opening chat...', 'info');
+        debugLog('📱 Opening chat widget...');
 
-      showStatus('Starting chat...', 'success');
-      
-      // Open the chat widget
-      amazon_connect('openChat');
+        // IMPORTANT: Small delay to ensure attributes are set
+        setTimeout(() => {
+          amazon_connect('openChat');
+          debugLog('✅ Chat open command sent');
+          showStatus('Chat widget should open now', 'success');
+        }, 100);
+
+      } catch (error) {
+        debugLog('❌ Error starting chat: ' + error.message);
+        showStatus('Error starting chat: ' + error.message, 'error');
+      }
     }
 
-    // Initialize when page loads
+    // Initialize agents when page loads
     document.addEventListener('DOMContentLoaded', function() {
       loadAgents();
       
-      // Enable enter key for initiating agent input
+      // Enable enter key for agent input
       document.getElementById('initiatingAgent').addEventListener('keypress', function(e) {
         if (e.key === 'Enter' && selectedAgent && this.value.trim()) {
           startChat();
