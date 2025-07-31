@@ -465,19 +465,25 @@
             clearInterval(checkAndLaunch);
             addDebugInfo('Launching chat widget...');
 
+            // FIXED: Set customer display name correctly
             amazon_connect('customerDisplayName', function(callback) {
-  callback(initiatingAgent);
-});
+              // Use the initiating agent name as the customer display name
+              callback(initiatingAgent);
+            });
             
             window.connectLaunchCallback();
             showStatus('Chat widget launched! The target agent will receive an incoming chat.', 'success');
-            addDebugInfo('Chat widget launched successfully with contact attributes');
+            addDebugInfo(`Chat widget launched successfully with customer display name: ${initiatingAgent}`);
             
           } else if (attempts >= maxAttempts) {
             clearInterval(checkAndLaunch);
             addDebugInfo('Failed to get launch callback, trying fallback...');
             
             if (typeof amazon_connect !== 'undefined') {
+              // Set customer display name before opening chat
+              amazon_connect('customerDisplayName', function(callback) {
+                callback(initiatingAgent);
+              });
               amazon_connect('openChat');
               showStatus('Chat opened using fallback method', 'success');
             } else {
