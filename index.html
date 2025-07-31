@@ -323,12 +323,18 @@
         addDebugInfo(`Contact attributes set: ${JSON.stringify(contactAttributes)}`);
       }
 
-      // Try to set customer display name directly
-      if (contactAttributes.customerName) {
-        amazon_connect('customerDisplayName', contactAttributes.customerName);
-        amazon_connect('displayName', contactAttributes.customerName);
-        addDebugInfo(`Set customer display name: ${contactAttributes.customerName}`);
-      }
+      // SOLUTION: Use customizationObject to override customer display name
+      amazon_connect('customizationObject', {
+        transcript: {
+          hideDisplayNames: false,
+          eventNames: {
+            customer: contactAttributes.customerName || "Agent", // This replaces "Customer" with agent name
+            agent: "Target Agent",
+            supervisor: "Supervisor"
+          }
+        }
+      });
+      addDebugInfo(`Customization object set with customer name: ${contactAttributes.customerName}`);
 
       // Configure custom launch behavior
       amazon_connect('customLaunchBehavior', {
@@ -438,7 +444,7 @@
         showStatus('Initializing chat with contact attributes...', 'loading');
         addDebugInfo('Starting agent-to-agent chat...');
 
-        // Prepare contact attributes - keeping original logic with just customer name addition
+        // Prepare contact attributes using Amazon Connect's standard format
         const contactAttributes = {
           'Agent': selectedAgent.username,
           'TargetUserId': selectedAgent.userId,
@@ -447,9 +453,7 @@
           'TargetAgentDisplayName': selectedAgent.displayName,
           'RoutingProfileId': selectedAgent.routingProfileId,
           'Timestamp': new Date().toISOString(),
-          'customerName': initiatingAgent,  // Add this single line for customer name display
-          'ContactDisplayName': initiatingAgent,  // Alternative attribute name
-          'ParticipantDisplayName': initiatingAgent  // Another alternative
+          'customerName': initiatingAgent
         };
 
         addDebugInfo(`Contact attributes prepared: ${JSON.stringify(contactAttributes)}`);
@@ -480,37 +484,6 @@
             window.connectLaunchCallback();
             showStatus(`Chat initiated! ${initiatingAgent} is now connecting to ${selectedAgent.displayName}`, 'success');
             addDebugInfo('Chat widget launched successfully with contact attributes');
-            
-            // Try to update customer name after widget launches
-            setTimeout(() => {
-              try {
-                // Method 1: Try to update via Amazon Connect API
-                if (typeof amazon_connect !== 'undefined') {
-                  amazon_connect('customerDisplayName', initiatingAgent);
-                  addDebugInfo('Attempted to set customer display name after launch');
-                }
-                
-                // Method 2: Try CSS-based replacement
-                const customerElements = document.querySelectorAll('[class*="customer"], [class*="Customer"]');
-                customerElements.forEach(el => {
-                  if (el.textContent && el.textContent.includes('Customer')) {
-                    el.textContent = el.textContent.replace('Customer', initiatingAgent);
-                    addDebugInfo('Replaced Customer text in DOM element');
-                  }
-                });
-                
-                // Method 3: Look for specific Amazon Connect elements
-                const connectElements = document.querySelectorAll('[id*="connect"], [class*="connect"]');
-                connectElements.forEach(el => {
-                  if (el.textContent && el.textContent.includes('Customer')) {
-                    el.textContent = el.textContent.replace('Customer', initiatingAgent);
-                    addDebugInfo('Replaced Customer text in Connect element');
-                  }
-                });
-              } catch (domError) {
-                addDebugInfo(`DOM manipulation error: ${domError.message}`);
-              }
-            }, 2000);
             
           } else if (attempts >= maxAttempts) {
             clearInterval(checkAndLaunch);
