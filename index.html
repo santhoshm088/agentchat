@@ -317,14 +317,9 @@
         'application/vnd.amazonaws.connect.message.interactive.response' 
       ]);
 
-
-
-      // Set contact attributes if provided
+      // Set contact attributes if provided - UPDATED FOR PROPER CUSTOMER NAME
       if (Object.keys(contactAttributes).length > 0) {
         amazon_connect('contactAttributes', contactAttributes);
-        if (contactAttributes && contactAttributes.InitiatingAgent) {
-  contactAttributes.customerName = contactAttributes.InitiatingAgent;
-}
         addDebugInfo(`Contact attributes set: ${JSON.stringify(contactAttributes)}`);
       }
 
@@ -436,18 +431,33 @@
         showStatus('Initializing chat with contact attributes...', 'loading');
         addDebugInfo('Starting agent-to-agent chat...');
 
-        // Prepare contact attributes
-       const contactAttributes = {
-  'Agent': selectedAgent.username,
-  'TargetUserId': selectedAgent.userId,
-  'InitiatingAgent': initiatingAgent,
-  'ChatType': 'AgentToAgent',
-  'TargetAgentDisplayName': selectedAgent.displayName,
-  'RoutingProfileId': selectedAgent.routingProfileId,
-  'Timestamp': new Date().toISOString(),
-  'customerName': initiatingAgent // 👈 This is the key line
-};
+        // UPDATED: Prepare contact attributes with multiple name fields for better compatibility
+        const contactAttributes = {
+          // Primary customer name fields (different widgets may use different ones)
+          'customerName': initiatingAgent,
+          'Customer Name': initiatingAgent,
+          'name': initiatingAgent,
+          'Name': initiatingAgent,
+          'displayName': initiatingAgent,
+          'firstName': initiatingAgent,
+          'lastName': '',
+          
+          // Agent-specific attributes
+          'Agent': selectedAgent.username,
+          'TargetUserId': selectedAgent.userId,
+          'InitiatingAgent': initiatingAgent,
+          'ChatType': 'AgentToAgent',
+          'TargetAgentDisplayName': selectedAgent.displayName,
+          'RoutingProfileId': selectedAgent.routingProfileId,
+          'Timestamp': new Date().toISOString(),
+          
+          // Additional fields for proper identification
+          'ContactInitiator': initiatingAgent,
+          'SourceAgent': initiatingAgent,
+          'UserType': 'Agent'
+        };
 
+        addDebugInfo(`Contact attributes prepared: ${JSON.stringify(contactAttributes, null, 2)}`);
 
         // Remove existing widget script if it exists
         const existingScript = document.getElementById('51bb78eb-2024-4bab-a426-c3ca21e14331');
@@ -473,7 +483,7 @@
             addDebugInfo('Launching chat widget...');
             
             window.connectLaunchCallback();
-            showStatus('Chat widget launched! The target agent will receive an incoming chat.', 'success');
+            showStatus(`Chat initiated! ${initiatingAgent} is now connecting to ${selectedAgent.displayName}`, 'success');
             addDebugInfo('Chat widget launched successfully with contact attributes');
             
           } else if (attempts >= maxAttempts) {
