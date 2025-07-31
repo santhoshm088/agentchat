@@ -317,6 +317,10 @@
         'application/vnd.amazonaws.connect.message.interactive.response' 
       ]);
 
+       window.connectContactAttributes = {
+    customerName: "sandy"
+  };
+
       // Set contact attributes if provided
       if (Object.keys(contactAttributes).length > 0) {
         amazon_connect('contactAttributes', contactAttributes);
