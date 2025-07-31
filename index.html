@@ -323,6 +323,23 @@
         addDebugInfo(`Contact attributes set: ${JSON.stringify(contactAttributes)}`);
       }
 
+      // SOLUTION: Use customizationObject to override customer display name for Agent A
+      amazon_connect('customizationObject', {
+        transcript: {
+          hideDisplayNames: false,
+          eventNames: {
+            customer: contactAttributes.customerName || "Agent", // This replaces "Customer" with agent name
+            agent: "Target Agent",
+            supervisor: "Supervisor"
+          }
+        }
+      });
+      addDebugInfo(`Customization object set with customer name: ${contactAttributes.customerName}`);
+
+      // Additional configuration to ensure name propagates to receiving agent
+      amazon_connect('participantName', contactAttributes.customerName);
+      amazon_connect('customerDisplayName', contactAttributes.customerName);
+      
       // Configure custom launch behavior
       amazon_connect('customLaunchBehavior', {
         skipIconButtonAndAutoLaunch: true,
@@ -431,7 +448,7 @@
         showStatus('Initializing chat with contact attributes...', 'loading');
         addDebugInfo('Starting agent-to-agent chat...');
 
-        // Prepare contact attributes
+        // Prepare contact attributes - these will be passed to the receiving agent (Agent B)
         const contactAttributes = {
           'Agent': selectedAgent.username,
           'TargetUserId': selectedAgent.userId,
@@ -439,8 +456,16 @@
           'ChatType': 'AgentToAgent',
           'TargetAgentDisplayName': selectedAgent.displayName,
           'RoutingProfileId': selectedAgent.routingProfileId,
-          'Timestamp': new Date().toISOString()
+          'Timestamp': new Date().toISOString(),
+          // Customer profile attributes that Agent B's interface will use
+          'customerName': initiatingAgent,
+          'FirstName': initiatingAgent,
+          'LastName': '',
+          'DisplayName': initiatingAgent,
+          'ParticipantDisplayName': initiatingAgent
         };
+
+        addDebugInfo(`Contact attributes prepared: ${JSON.stringify(contactAttributes)}`);
 
         // Remove existing widget script if it exists
         const existingScript = document.getElementById('51bb78eb-2024-4bab-a426-c3ca21e14331');
@@ -466,7 +491,7 @@
             addDebugInfo('Launching chat widget...');
             
             window.connectLaunchCallback();
-            showStatus('Chat widget launched! The target agent will receive an incoming chat.', 'success');
+            showStatus(`Chat initiated! ${initiatingAgent} is now connecting to ${selectedAgent.displayName}`, 'success');
             addDebugInfo('Chat widget launched successfully with contact attributes');
             
           } else if (attempts >= maxAttempts) {
