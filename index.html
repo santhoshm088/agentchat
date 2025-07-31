@@ -438,7 +438,7 @@
         showStatus('Initializing chat with contact attributes...', 'loading');
         addDebugInfo('Starting agent-to-agent chat...');
 
-        // Prepare contact attributes - keeping original logic with just customer name addition
+        // Prepare contact attributes using Amazon Connect's standard customer attributes
         const contactAttributes = {
           'Agent': selectedAgent.username,
           'TargetUserId': selectedAgent.userId,
@@ -447,9 +447,11 @@
           'TargetAgentDisplayName': selectedAgent.displayName,
           'RoutingProfileId': selectedAgent.routingProfileId,
           'Timestamp': new Date().toISOString(),
-          'customerName': initiatingAgent,  // Add this single line for customer name display
-          'ContactDisplayName': initiatingAgent,  // Alternative attribute name
-          'ParticipantDisplayName': initiatingAgent  // Another alternative
+          // Use Amazon Connect's standard customer profile attributes
+          'First name': initiatingAgent,
+          'Last name': '',
+          'customerName': initiatingAgent,
+          'Profile ID': initiatingAgent
         };
 
         addDebugInfo(`Contact attributes prepared: ${JSON.stringify(contactAttributes)}`);
