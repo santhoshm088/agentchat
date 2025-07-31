@@ -317,7 +317,7 @@
         'application/vnd.amazonaws.connect.message.interactive.response' 
       ]);
 
-      // Set contact attributes if provided - UPDATED FOR PROPER CUSTOMER NAME
+      // Set contact attributes if provided
       if (Object.keys(contactAttributes).length > 0) {
         amazon_connect('contactAttributes', contactAttributes);
         addDebugInfo(`Contact attributes set: ${JSON.stringify(contactAttributes)}`);
@@ -431,18 +431,8 @@
         showStatus('Initializing chat with contact attributes...', 'loading');
         addDebugInfo('Starting agent-to-agent chat...');
 
-        // UPDATED: Prepare contact attributes with multiple name fields for better compatibility
+        // Prepare contact attributes - keeping original logic with just customer name addition
         const contactAttributes = {
-          // Primary customer name fields (different widgets may use different ones)
-          'customerName': initiatingAgent,
-          'Customer Name': initiatingAgent,
-          'name': initiatingAgent,
-          'Name': initiatingAgent,
-          'displayName': initiatingAgent,
-          'firstName': initiatingAgent,
-          'lastName': '',
-          
-          // Agent-specific attributes
           'Agent': selectedAgent.username,
           'TargetUserId': selectedAgent.userId,
           'InitiatingAgent': initiatingAgent,
@@ -450,14 +440,10 @@
           'TargetAgentDisplayName': selectedAgent.displayName,
           'RoutingProfileId': selectedAgent.routingProfileId,
           'Timestamp': new Date().toISOString(),
-          
-          // Additional fields for proper identification
-          'ContactInitiator': initiatingAgent,
-          'SourceAgent': initiatingAgent,
-          'UserType': 'Agent'
+          'customerName': initiatingAgent  // Add this single line for customer name display
         };
 
-        addDebugInfo(`Contact attributes prepared: ${JSON.stringify(contactAttributes, null, 2)}`);
+        addDebugInfo(`Contact attributes prepared: ${JSON.stringify(contactAttributes)}`);
 
         // Remove existing widget script if it exists
         const existingScript = document.getElementById('51bb78eb-2024-4bab-a426-c3ca21e14331');
