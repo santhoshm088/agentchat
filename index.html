@@ -437,15 +437,17 @@
         addDebugInfo('Starting agent-to-agent chat...');
 
         // Prepare contact attributes
-        const contactAttributes = {
-          'Agent': selectedAgent.username,
-          'TargetUserId': selectedAgent.userId,
-          'InitiatingAgent': initiatingAgent,
-          'ChatType': 'AgentToAgent',
-          'TargetAgentDisplayName': selectedAgent.displayName,
-          'RoutingProfileId': selectedAgent.routingProfileId,
-          'Timestamp': new Date().toISOString()
-        };
+       const contactAttributes = {
+  'Agent': selectedAgent.username,
+  'TargetUserId': selectedAgent.userId,
+  'InitiatingAgent': initiatingAgent,
+  'ChatType': 'AgentToAgent',
+  'TargetAgentDisplayName': selectedAgent.displayName,
+  'RoutingProfileId': selectedAgent.routingProfileId,
+  'Timestamp': new Date().toISOString(),
+  'customerName': initiatingAgent // 👈 This is the key line
+};
+
 
         // Remove existing widget script if it exists
         const existingScript = document.getElementById('51bb78eb-2024-4bab-a426-c3ca21e14331');
