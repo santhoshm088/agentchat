@@ -444,38 +444,6 @@
         amazon_connect('contactAttributes', contactAttributes);
         addDebugInfo(`Contact attributes set: ${JSON.stringify(contactAttributes)}`);
 
-        // Try to initiate the chat via API first (optional - for logging/tracking)
-        try {
-          const chatResponse = await fetch(API_BASE_URL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              initiatingAgent: initiatingAgent,
-              targetAgent: selectedAgent.username,
-              targetUserId: selectedAgent.userId,
-              routingProfileId: selectedAgent.routingProfileId,
-              initialMessage: `Chat request from ${initiatingAgent}`
-            })
-          });
-
-          if (chatResponse.ok) {
-            const chatData = await chatResponse.json();
-            addDebugInfo(`Chat initiated via API: ${JSON.stringify(chatData)}`);
-            
-            // Update contact attributes with API response data if available
-            if (chatData.contactId) {
-              contactAttributes['ContactId'] = chatData.contactId;
-              amazon_connect('contactAttributes', contactAttributes);
-            }
-          } else {
-            addDebugInfo(`API call failed: ${chatResponse.status}, continuing with widget launch`);
-          }
-        } catch (apiError) {
-          addDebugInfo(`API error (continuing): ${apiError.message}`);
-        }
-
         // Now launch the chat widget using the stored callback
         if (window.connectLaunchCallback && typeof window.connectLaunchCallback === 'function') {
           addDebugInfo('Launching chat widget using custom launch callback...');
@@ -484,7 +452,7 @@
           window.connectLaunchCallback();
           
           showStatus('Chat widget launched! The target agent will receive an incoming chat.', 'success');
-          addDebugInfo('Chat widget launched successfully using programmatic launch');
+          addDebugInfo('Chat widget launched successfully - the communication widget will handle the chat creation');
           
         } else {
           // Fallback to traditional method if callback not available
