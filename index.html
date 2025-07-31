@@ -245,63 +245,13 @@
     </div>
   </div>
 
-  <!-- Amazon Connect Widget Script with Custom Launch Behavior -->
-  <script type="text/javascript">
-    (function(w, d, x, id){
-    s=d.createElement('script');
-    s.src='https://sharecare-hds-dev-p3f.my.connect.aws/connectwidget/static/amazon-connect-chat-interface-client.js';
-    s.async=1;
-    s.id=id;
-    d.getElementsByTagName('head')[0].appendChild(s);
-    w[x] =  w[x] || function() { (w[x].ac = w[x].ac || []).push(arguments) };
-  })(window, document, 'amazon_connect', '51bb78eb-2024-4bab-a426-c3ca21e14331');
-  amazon_connect('styles', { iconType: 'CHAT', openChat: { color: '#ffffff', backgroundColor: '#00BFA5' }, closeChat: { color: '#ffffff', backgroundColor: '#00BFA5'} });
-  amazon_connect('snippetId', 'QVFJREFIaFg3VVJ2dFRXb2IrUUdndUkvUzRJMnRnQ1NJL3Erc1JKT0lFQ3lCQlNlUEFFSnBlREpsTldscUlya3hNbjNkYTJ4QUFBQWJqQnNCZ2txaGtpRzl3MEJCd2FnWHpCZEFnRUFNRmdHQ1NxR1NJYjNEUUVIQVRBZUJnbGdoa2dCWlFNRUFTNHdFUVFNNHRpTGthdExjVTRENmI3dUFnRVFnQ3Z3bHNhYkx6THBEM3dFN2JOWFkzZEtuVHJGZ1JWVnM3Sk5lOW5Mb2oxNFk0bUxURXRHRG02b1c4Wmk6OkthQ1pySzRxaFF4OEJDd3RYazUreTQyTVc0R2x3ZnJUQmdmejBhTG5vOXZvN25Pc3ZlNmZ1SmxtWWRZa09wc2dITkVDRDIxbVdBazBzczFKSzZ2ZncvakRTczRFTHUwV2hlUTk2UU5QbzJacnJMS294NjFCeXNXT1ZDOVNFNHlvbHpvSjdjcnJLL0V1YytsamZwSVRLcXpIZlcwQTlGcz0=');
-  amazon_connect('supportedMessagingContentTypes', [ 'text/plain', 'text/markdown', 'application/vnd.amazonaws.connect.message.interactive', 'application/vnd.amazonaws.connect.message.interactive.response' ]);
-
-amazon_connect('contactAttributes', {
-   'Agent': "sandy",
-  })
-    // Configure custom launch behavior - this is the key part!
-    amazon_connect('customLaunchBehavior', {
-      skipIconButtonAndAutoLaunch: true,
-      alwaysHideWidgetButton: true,
-      programmaticLaunch: (function(launchCallback) {
-        // Store the launch callback globally so we can use it later
-        // window.connectLaunchCallback = launchCallback;
-        
-        // // Also store cleanup function
-        // window.onunload = function() {
-        //   if (window.connectLaunchCallback) {
-        //     window.connectLaunchCallback = null;
-        //   }
-        //   return;
-        // }
-
-
-
-     var launchWidgetBtn = document.getElementById('startChatBtn');
-            if (launchWidgetBtn) {
-                launchWidgetBtn.addEventListener('click', launchCallback);
-                window.onunload = function() {
-                launchWidgetBtn.removeEventListener('click', launchCallback);
-                return;
-                }
-            }
-
-
-      })
-    });
-
-    console.log('Amazon Connect widget initialized with custom launch behavior');
-  </script>
-
   <script>
     const API_BASE_URL = 'https://9dpiz8q0bh.execute-api.us-east-1.amazonaws.com/dev';
     
     let selectedAgent = null;
     let agentList = [];
     let debugMode = false;
+    let widgetInitialized = false;
 
     // Debug logging function
     function addDebugInfo(message) {
@@ -330,6 +280,61 @@ amazon_connect('contactAttributes', {
           statusDiv.style.display = 'none';
         }, 5000);
       }
+    }
+
+    // Initialize Amazon Connect Widget with contact attributes
+    function initializeWidget(contactAttributes = {}) {
+      if (widgetInitialized) {
+        addDebugInfo('Widget already initialized, skipping...');
+        return;
+      }
+
+      addDebugInfo('Initializing Amazon Connect widget...');
+      
+      // Load the widget script
+      (function(w, d, x, id){
+        s = d.createElement('script');
+        s.src = 'https://sharecare-hds-dev-p3f.my.connect.aws/connectwidget/static/amazon-connect-chat-interface-client.js';
+        s.async = 1;
+        s.id = id;
+        d.getElementsByTagName('head')[0].appendChild(s);
+        w[x] = w[x] || function() { (w[x].ac = w[x].ac || []).push(arguments) };
+      })(window, document, 'amazon_connect', '51bb78eb-2024-4bab-a426-c3ca21e14331');
+
+      // Configure widget with contact attributes
+      amazon_connect('styles', { 
+        iconType: 'CHAT', 
+        openChat: { color: '#ffffff', backgroundColor: '#00BFA5' }, 
+        closeChat: { color: '#ffffff', backgroundColor: '#00BFA5'} 
+      });
+      
+      amazon_connect('snippetId', 'QVFJREFIaFg3VVJ2dFRXb2IrUUdndUkvUzRJMnRnQ1NJL3Erc1JKT0lFQ3lCQlNlUEFFSnBlREpsTldscUlya3hNbjNkYTJ4QUFBQWJqQnNCZ2txaGtpRzl3MEJCd2FnWHpCZEFnRUFNRmdHQ1NxR1NJYjNEUUVIQVRBZUJnbGdoa2dCWlFNRUFTNHdFUVFNNHRpTGthdExjVTRENmI3dUFnRVFnQ3Z3bHNhYkx6THBEM3dFN2JOWFkzZEtuVHJGZ1JWVnM3Sk5lOW5Mb2oxNFk0bUxURXRHRG02b1c4Wmk6OkthQ1pySzRxaFF4OEJDd3RYazUreTQyTVc0R2x3ZnJUQmdmejBhTG5vOXZvN25Pc3ZlNmZ1SmxtWWRZa09wc2dITkVDRDIxbVdBazBzczFKSzZ2ZncvakRTczRFTHUwV2hlUTk2UU5QbzJacnJMS294NjFCeXNXT1ZDOVNFNHlvbHpvSjdjcnJLL0V1YytsamZwSVRLcXpIZlcwQTlGcz0=');
+      
+      amazon_connect('supportedMessagingContentTypes', [ 
+        'text/plain', 
+        'text/markdown', 
+        'application/vnd.amazonaws.connect.message.interactive', 
+        'application/vnd.amazonaws.connect.message.interactive.response' 
+      ]);
+
+      // Set contact attributes if provided
+      if (Object.keys(contactAttributes).length > 0) {
+        amazon_connect('contactAttributes', contactAttributes);
+        addDebugInfo(`Contact attributes set: ${JSON.stringify(contactAttributes)}`);
+      }
+
+      // Configure custom launch behavior
+      amazon_connect('customLaunchBehavior', {
+        skipIconButtonAndAutoLaunch: true,
+        alwaysHideWidgetButton: true,
+        programmaticLaunch: (function(launchCallback) {
+          window.connectLaunchCallback = launchCallback;
+          addDebugInfo('Custom launch callback registered');
+        })
+      });
+
+      widgetInitialized = true;
+      addDebugInfo('Amazon Connect widget initialized successfully');
     }
 
     // Load agents from API
@@ -423,34 +428,59 @@ amazon_connect('contactAttributes', {
       }
 
       try {
-        showStatus('Initiating chat...', 'loading');
+        showStatus('Initializing chat with contact attributes...', 'loading');
         addDebugInfo('Starting agent-to-agent chat...');
 
-        // Set up contact attributes for the widget BEFORE launching
+        // Prepare contact attributes
         const contactAttributes = {
-          'Agent': "sandy",
+          'TargetAgent': selectedAgent.username,
+          'TargetUserId': selectedAgent.userId,
+          'InitiatingAgent': initiatingAgent,
+          'ChatType': 'AgentToAgent',
+          'TargetAgentDisplayName': selectedAgent.displayName,
+          'RoutingProfileId': selectedAgent.routingProfileId,
+          'Timestamp': new Date().toISOString()
         };
 
-        // Set contact attributes
-        amazon_connect('contactAttributes', contactAttributes);
-        addDebugInfo(`Contact attributes set: ${JSON.stringify(contactAttributes)}`);
-
-        // Now launch the chat widget using the stored callback
-        if (window.connectLaunchCallback && typeof window.connectLaunchCallback === 'function') {
-          addDebugInfo('Launching chat widget using custom launch callback...');
-          
-          // Call the launch callback to open the widget
-          window.connectLaunchCallback();
-          
-          showStatus('Chat widget launched! The target agent will receive an incoming chat.', 'success');
-          addDebugInfo('Chat widget launched successfully - the communication widget will handle the chat creation');
-          
-        } else {
-          // Fallback to traditional method if callback not available
-          addDebugInfo('Launch callback not available, trying fallback method...');
-          amazon_connect('openChat');
-          showStatus('Chat widget opened (fallback method)', 'success');
+        // Remove existing widget script if it exists
+        const existingScript = document.getElementById('51bb78eb-2024-4bab-a426-c3ca21e14331');
+        if (existingScript) {
+          existingScript.remove();
+          addDebugInfo('Removed existing widget script');
         }
+
+        // Reset widget initialization flag
+        widgetInitialized = false;
+        
+        // Initialize widget with contact attributes
+        initializeWidget(contactAttributes);
+
+        // Wait for widget to be ready, then launch
+        let attempts = 0;
+        const maxAttempts = 20;
+        const checkAndLaunch = setInterval(() => {
+          attempts++;
+          
+          if (window.connectLaunchCallback && typeof window.connectLaunchCallback === 'function') {
+            clearInterval(checkAndLaunch);
+            addDebugInfo('Launching chat widget...');
+            
+            window.connectLaunchCallback();
+            showStatus('Chat widget launched! The target agent will receive an incoming chat.', 'success');
+            addDebugInfo('Chat widget launched successfully with contact attributes');
+            
+          } else if (attempts >= maxAttempts) {
+            clearInterval(checkAndLaunch);
+            addDebugInfo('Failed to get launch callback, trying fallback...');
+            
+            if (typeof amazon_connect !== 'undefined') {
+              amazon_connect('openChat');
+              showStatus('Chat opened using fallback method', 'success');
+            } else {
+              showStatus('Failed to initialize chat widget', 'error');
+            }
+          }
+        }, 500);
 
       } catch (error) {
         console.error('Error starting chat:', error);
@@ -470,42 +500,6 @@ amazon_connect('contactAttributes', {
           startAgentChat();
         }
       });
-
-      // Check if Amazon Connect widget is ready and set up callbacks
-      let widgetCheckCount = 0;
-      const checkWidget = setInterval(() => {
-        widgetCheckCount++;
-        if (typeof amazon_connect !== 'undefined') {
-          addDebugInfo('Amazon Connect widget is ready');
-          clearInterval(checkWidget);
-          
-          // Set up widget event listeners
-          amazon_connect('onStartChat', function() {
-            addDebugInfo('Chat session started successfully');
-            showStatus('Chat is now active!', 'success');
-          });
-
-          amazon_connect('onError', function(error) {
-            addDebugInfo(`Widget error: ${JSON.stringify(error)}`);
-            showStatus('Widget error occurred', 'error');
-          });
-
-          amazon_connect('onChatEnded', function() {
-            addDebugInfo('Chat session ended');
-          });
-
-          // Verify that the launch callback is properly set
-          if (window.connectLaunchCallback && typeof window.connectLaunchCallback === 'function') {
-            addDebugInfo('Custom launch callback is ready');
-          } else {
-            addDebugInfo('Warning: Custom launch callback not found');
-          }
-
-        } else if (widgetCheckCount > 20) {
-          addDebugInfo('Warning: Amazon Connect widget may not be loaded properly');
-          clearInterval(checkWidget);
-        }
-      }, 500);
     });
 
     // Handle page visibility for better UX
