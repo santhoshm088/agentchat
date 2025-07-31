@@ -464,6 +464,10 @@
           if (window.connectLaunchCallback && typeof window.connectLaunchCallback === 'function') {
             clearInterval(checkAndLaunch);
             addDebugInfo('Launching chat widget...');
+
+            amazon_connect('customerDisplayName', function(callback) {
+  callback(initiatingAgent);
+});
             
             window.connectLaunchCallback();
             showStatus('Chat widget launched! The target agent will receive an incoming chat.', 'success');
