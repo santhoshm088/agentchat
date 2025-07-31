@@ -259,7 +259,9 @@
   amazon_connect('snippetId', 'QVFJREFIaFg3VVJ2dFRXb2IrUUdndUkvUzRJMnRnQ1NJL3Erc1JKT0lFQ3lCQlNlUEFFSnBlREpsTldscUlya3hNbjNkYTJ4QUFBQWJqQnNCZ2txaGtpRzl3MEJCd2FnWHpCZEFnRUFNRmdHQ1NxR1NJYjNEUUVIQVRBZUJnbGdoa2dCWlFNRUFTNHdFUVFNNHRpTGthdExjVTRENmI3dUFnRVFnQ3Z3bHNhYkx6THBEM3dFN2JOWFkzZEtuVHJGZ1JWVnM3Sk5lOW5Mb2oxNFk0bUxURXRHRG02b1c4Wmk6OkthQ1pySzRxaFF4OEJDd3RYazUreTQyTVc0R2x3ZnJUQmdmejBhTG5vOXZvN25Pc3ZlNmZ1SmxtWWRZa09wc2dITkVDRDIxbVdBazBzczFKSzZ2ZncvakRTczRFTHUwV2hlUTk2UU5QbzJacnJMS294NjFCeXNXT1ZDOVNFNHlvbHpvSjdjcnJLL0V1YytsamZwSVRLcXpIZlcwQTlGcz0=');
   amazon_connect('supportedMessagingContentTypes', [ 'text/plain', 'text/markdown', 'application/vnd.amazonaws.connect.message.interactive', 'application/vnd.amazonaws.connect.message.interactive.response' ]);
 
-
+amazon_connect('contactAttributes', {
+   'Agent': "sandy",
+  })
     // Configure custom launch behavior - this is the key part!
     amazon_connect('customLaunchBehavior', {
       skipIconButtonAndAutoLaunch: true,
@@ -427,12 +429,6 @@
         // Set up contact attributes for the widget BEFORE launching
         const contactAttributes = {
           'Agent': "sandy",
-          'TargetUserId': selectedAgent.userId,
-          'InitiatingAgent': initiatingAgent,
-          'ChatType': 'AgentToAgent',
-          'TargetAgentDisplayName': selectedAgent.displayName,
-          'RoutingProfileId': selectedAgent.routingProfileId,
-          'Timestamp': new Date().toISOString()
         };
 
         // Set contact attributes
